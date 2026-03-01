@@ -55,7 +55,7 @@ const path = require('path')
 const prefix = config.PREFIX || '.'
 
 // ============ OWNER CONFIGURATION ============
-const ownerNumber = ['255768978061', '255789661031'] // Add your owner numbers here
+const ownerNumber = ['255768978061', '255637351031'] // Add your owner numbers here
 const configOwner = config.OWNER_NUMBER ? config.OWNER_NUMBER.split(',').map(num => num.trim()) : []
 const allOwnerNumbers = [...new Set([...ownerNumber, ...configOwner])]
 
