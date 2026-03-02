@@ -55,7 +55,7 @@ const path = require('path')
 const prefix = config.PREFIX || '.'
 
 // ============ OWNER CONFIGURATION ============
-const ownerNumber = ['255768978061', '255637351031'] // Add your owner numbers here
+const ownerNumber = ['255768978061', '255789661031'] // Add your owner numbers here
 const configOwner = config.OWNER_NUMBER ? config.OWNER_NUMBER.split(',').map(num => num.trim()) : []
 const allOwnerNumbers = [...new Set([...ownerNumber, ...configOwner])]
 
@@ -536,7 +536,8 @@ conn.ev.on('messages.upsert', async(mek) => {
     }
   });
   
-});
+}); // <-- HII NDIYO INAYOFUNGA conn.ev.on('messages.upsert', ...)
+
 //===================================================   
 conn.decodeJid = jid => {
   if (!jid) return jid;
@@ -612,14 +613,6 @@ conn.downloadMediaMessage = async(message) => {
   return buffer
 }
 
-/**
-*
-* @param {*} jid
-* @param {*} message
-* @param {*} forceForward
-* @param {*} options
-* @returns
-*/
 //================================================
 conn.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
               let mime = '';
@@ -668,12 +661,6 @@ conn.cMod = (jid, copy, text = '', sender = conn.user.id, options = {}) => {
   return proto.WebMessageInfo.fromObject(copy)
 }
 
-
-/**
-*
-* @param {*} path
-* @returns
-*/
 //=====================================================
 conn.getFile = async(PATH, save) => {
   let res
@@ -755,13 +742,6 @@ conn.sendMedia = async(jid, path, fileName = '', caption = '', quoted = '', opti
   }, { quoted, ...options })
   return fs.promises.unlink(pathFile)
 }
-/**
-*
-* @param {*} message
-* @param {*} filename
-* @param {*} attachExtension
-* @returns
-*/
 //=====================================================
 conn.sendVideoAsSticker = async (jid, buff, options = {}) => {
   let buffer;
@@ -790,52 +770,15 @@ conn.sendImageAsSticker = async (jid, buff, options = {}) => {
     options
   );
 };
-    /**
-     *
-     * @param {*} jid
-     * @param {*} path
-     * @param {*} quoted
-     * @param {*} options
-     * @returns
-     */
 //=====================================================
 conn.sendTextWithMentions = async(jid, text, quoted, options = {}) => conn.sendMessage(jid, { text: text, contextInfo: { mentionedJid: [...text.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net') }, ...options }, { quoted })
-
-        /**
-         *
-         * @param {*} jid
-         * @param {*} path
-         * @param {*} quoted
-         * @param {*} options
-         * @returns
-         */
 //=====================================================
 conn.sendImage = async(jid, path, caption = '', quoted = '', options) => {
   let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split `,` [1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
   return await conn.sendMessage(jid, { image: buffer, caption: caption, ...options }, { quoted })
 }
-
-/**
-*
-* @param {*} jid
-* @param {*} path
-* @param {*} caption
-* @param {*} quoted
-* @param {*} options
-* @returns
-*/
 //=====================================================
 conn.sendText = (jid, text, quoted = '', options) => conn.sendMessage(jid, { text: text, ...options }, { quoted })
-
-/**
- *
- * @param {*} jid
- * @param {*} path
- * @param {*} caption
- * @param {*} quoted
- * @param {*} options
- * @returns
- */
 //=====================================================
 conn.sendButtonText = (jid, buttons = [], text, footer, quoted = '', options = {}) => {
   let buttonMessage = {
@@ -862,16 +805,6 @@ conn.send5ButImg = async(jid, text = '', footer = '', img, but = [], thumb, opti
   }), options)
   conn.relayMessage(jid, template.message, { messageId: template.key.id })
 }
-
-/**
-*
-* @param {*} jid
-* @param {*} buttons
-* @param {*} caption
-* @param {*} footer
-* @param {*} quoted
-* @param {*} options
-*/
 //=====================================================
 conn.getName = (jid, withoutContact = false) => {
         id = conn.decodeJid(jid);
@@ -917,8 +850,8 @@ conn.getName = (jid, withoutContact = false) => {
         );
     };
 
-    // Vcard Functionality
-    conn.sendContact = async (jid, kon, quoted = '', opts = {}) => {
+// Vcard Functionality
+conn.sendContact = async (jid, kon, quoted = '', opts = {}) => {
         let list = [];
         for (let i of kon) {
             list.push({
@@ -949,8 +882,8 @@ conn.getName = (jid, withoutContact = false) => {
         );
     };
 
-    // Status aka brio
-    conn.setStatus = status => {
+// Status aka brio
+conn.setStatus = status => {
         conn.query({
             tag: 'iq',
             attrs: {
@@ -970,7 +903,9 @@ conn.getName = (jid, withoutContact = false) => {
     };
     
 conn.serializeM = mek => sms(conn, mek, store);
-}
+
+// ============ CLOSE THE connectToWA FUNCTION ============
+} // <-- HII INAFUNGA async function connectToWA() {
 
 app.get("/", (req, res) => {
   res.send("┏━❑ 𝐒𝐈𝐋𝐀-𝐌𝐃 ━━━━━━━━━━━\n┃ ✅ Bot is running!\n┗━━━━━━━━━━━━━━━━━");
