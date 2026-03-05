@@ -53,7 +53,69 @@ const Crypto = require('crypto')
 const path = require('path')
 const prefix = config.PREFIX
 
-const ownerNumber = ['255768978061']
+// ============ OWNER CONFIGURATION ============
+const ownerNumber = ['255768978061', '255789661031'] // Add your owner numbers here
+const ownerJids = ownerNumber.map(num => num.includes('@s.whatsapp.net') ? num : num + '@s.whatsapp.net')
+
+// ============ SECURITY FEATURES DATABASE ============
+const securityDB = {
+  antiMedia: {
+    enabled: false,
+    deleteSilently: true,
+    mediaTypes: {
+      image: true,
+      video: true,
+      audio: true,
+      document: true,
+      sticker: true,
+      gif: true
+    },
+    allowedGroups: [] // Groups where anti-media is disabled
+  },
+  antiTag: {
+    enabled: false,
+    maxMentions: 5,
+    action: 'warn', // warn, delete, kick
+    warnCount: 3
+  },
+  antiBug: {
+    enabled: true,
+    blockBugMessages: true,
+    logBugs: true
+  },
+  antiSpam: {
+    enabled: false,
+    maxMessages: 5,
+    timeWindow: 5000, // 5 seconds
+    action: 'warn', // warn, mute, kick
+    warnCount: 3,
+    userMessages: new Map()
+  },
+  antiBan: {
+    enabled: true,
+    protectOwner: true,
+    protectAdmins: true,
+    protectBot: true,
+    blockDeleteGroup: true,
+    blockPromoteDemote: true
+  }
+}
+
+// Load security settings if file exists
+const securityFile = './security.json'
+if (fs.existsSync(securityFile)) {
+  try {
+    const loaded = JSON.parse(fs.readFileSync(securityFile))
+    Object.assign(securityDB, loaded)
+  } catch (e) {
+    console.error('Error loading security settings:', e)
+  }
+}
+
+// Save security settings
+function saveSecurity() {
+  fs.writeFileSync(securityFile, JSON.stringify(securityDB, null, 2))
+}
 
 const tempDir = path.join(os.tmpdir(), 'cache-temp')
 if (!fs.existsSync(tempDir)) {
@@ -110,6 +172,221 @@ const port = process.env.PORT || 9090
 
 let conn // ✅ GLOBAL conn declaration
 
+// ============ SECURITY FUNCTIONS ============
+
+// Anti-Media Function
+async function handleAntiMedia(conn, mek, from, sender, isOwner, isAdmins) {
+  if (!securityDB.antiMedia.enabled) return false
+  if (isOwner || isAdmins) return false // Skip for owner and admins
+  
+  // Check if group is allowed
+  if (securityDB.antiMedia.allowedGroups.includes(from)) return false
+  
+  const type = getContentType(mek.message)
+  if (!type) return false
+  
+  let mediaType = ''
+  if (type.includes('image')) mediaType = 'image'
+  else if (type.includes('video')) mediaType = 'video'
+  else if (type.includes('audio')) mediaType = 'audio'
+  else if (type.includes('document')) mediaType = 'document'
+  else if (type.includes('sticker')) mediaType = 'sticker'
+  else if (type.includes('gif')) mediaType = 'gif'
+  else return false
+  
+  // Check if this media type should be deleted
+  if (securityDB.antiMedia.mediaTypes[mediaType]) {
+    if (securityDB.antiMedia.deleteSilently) {
+      // Delete silently without notification
+      await conn.sendMessage(from, { delete: mek.key })
+      console.log(`🔇 Silently deleted ${mediaType} from ${sender}`)
+    } else {
+      // Delete with warning
+      await conn.sendMessage(from, { delete: mek.key })
+      await conn.sendMessage(from, { 
+        text: `⚠️ *Anti-Media*\n\n${mediaType} imefutwa kwa sababu media haziruhusiwi kwenye group hili.`,
+        contextInfo: { mentionedJid: [sender] }
+      })
+    }
+    return true
+  }
+  return false
+}
+
+// Anti-Tag Function
+async function handleAntiTag(conn, mek, from, sender, isOwner, isAdmins, groupMetadata) {
+  if (!securityDB.antiTag.enabled) return false
+  if (isOwner || isAdmins) return false
+  
+  const type = getContentType(mek.message)
+  if (!type) return false
+  
+  let mentions = []
+  if (type === 'extendedTextMessage' && mek.message.extendedTextMessage?.contextInfo?.mentionedJid) {
+    mentions = mek.message.extendedTextMessage.contextInfo.mentionedJid
+  }
+  
+  if (mentions.length > securityDB.antiTag.maxMentions) {
+    // Track warns for this user
+    const userWarns = antiTagWarns.get(sender) || 0
+    const newWarns = userWarns + 1
+    antiTagWarns.set(sender, newWarns)
+    
+    if (securityDB.antiTag.action === 'warn') {
+      if (newWarns >= securityDB.antiTag.warnCount) {
+        // Kick after too many warns
+        await conn.groupParticipantsUpdate(from, [sender], 'remove')
+        antiTagWarns.delete(sender)
+        await conn.sendMessage(from, { 
+          text: `🚫 *Anti-Tag*\n\n@${sender.split('@')[0]} amefukuzwa kwa kutumia mentions nyingi.`,
+          contextInfo: { mentionedJid: [sender] }
+        })
+      } else {
+        await conn.sendMessage(from, { 
+          text: `⚠️ *Anti-Tag Warning (${newWarns}/${securityDB.antiTag.warnCount})*\n\nUsitumie mentions nyingi (${mentions.length}). Max ni ${securityDB.antiTag.maxMentions}.`,
+          contextInfo: { mentionedJid: [sender] }
+        })
+      }
+    } else if (securityDB.antiTag.action === 'delete') {
+      await conn.sendMessage(from, { delete: mek.key })
+    } else if (securityDB.antiTag.action === 'kick') {
+      await conn.groupParticipantsUpdate(from, [sender], 'remove')
+    }
+    return true
+  }
+  return false
+}
+
+// Anti-Bug Function
+async function handleAntiBug(conn, mek, from, sender) {
+  if (!securityDB.antiBug.enabled) return false
+  
+  const type = getContentType(mek.message)
+  if (!type) return false
+  
+  let text = ''
+  if (type === 'conversation') text = mek.message.conversation
+  else if (type === 'extendedTextMessage') text = mek.message.extendedTextMessage.text
+  else return false
+  
+  // Bug patterns to detect
+  const bugPatterns = [
+    /[\u0000-\u001F\u007F-\u009F]/, // Control characters
+    /\u202E/, // Right-to-left override
+    /.{1000,}/, // Very long messages
+    /<[^>]*script/i, // HTML/script tags
+    /[\uD800-\uDFFF]{2,}/ // Invalid Unicode
+  ]
+  
+  for (const pattern of bugPatterns) {
+    if (pattern.test(text)) {
+      if (securityDB.antiBug.blockBugMessages) {
+        await conn.sendMessage(from, { delete: mek.key })
+        if (securityDB.antiBug.logBugs) {
+          console.log(`🐛 Bug message blocked from ${sender}: ${text.slice(0, 100)}`)
+        }
+      }
+      return true
+    }
+  }
+  return false
+}
+
+// Anti-Spam Function
+const userMessages = new Map()
+const antiTagWarns = new Map()
+
+async function handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins) {
+  if (!securityDB.antiSpam.enabled) return false
+  if (isOwner || isAdmins) return false
+  
+  const now = Date.now()
+  const userData = securityDB.antiSpam.userMessages.get(sender) || { count: 0, firstMsg: now }
+  
+  if (now - userData.firstMsg < securityDB.antiSpam.timeWindow) {
+    userData.count++
+    securityDB.antiSpam.userMessages.set(sender, userData)
+    
+    if (userData.count > securityDB.antiSpam.maxMessages) {
+      // Track warns
+      const userWarns = antiTagWarns.get(sender) || 0
+      const newWarns = userWarns + 1
+      antiTagWarns.set(sender, newWarns)
+      
+      if (securityDB.antiSpam.action === 'warn') {
+        if (newWarns >= securityDB.antiSpam.warnCount) {
+          await conn.groupParticipantsUpdate(from, [sender], 'remove')
+          antiTagWarns.delete(sender)
+          securityDB.antiSpam.userMessages.delete(sender)
+        } else {
+          await conn.sendMessage(from, { 
+            text: `⚠️ *Anti-Spam Warning (${newWarns}/${securityDB.antiSpam.warnCount})*\n\nTafadhali usitumie spam.`,
+            contextInfo: { mentionedJid: [sender] }
+          })
+        }
+      } else if (securityDB.antiSpam.action === 'mute') {
+        // Mute for 5 minutes
+        await conn.groupParticipantsUpdate(from, [sender], 'mute')
+      } else if (securityDB.antiSpam.action === 'kick') {
+        await conn.groupParticipantsUpdate(from, [sender], 'remove')
+      }
+      
+      // Delete spam messages
+      await conn.sendMessage(from, { delete: mek.key })
+      return true
+    }
+  } else {
+    // Reset counter
+    securityDB.antiSpam.userMessages.set(sender, { count: 1, firstMsg: now })
+  }
+  return false
+}
+
+// Anti-Ban Function
+async function handleAntiBan(conn, update, groupId, participant, action, executor) {
+  if (!securityDB.antiBan.enabled) return false
+  
+  const botJid = conn.user.id
+  const isExecutorOwner = ownerJids.includes(executor)
+  const isExecutorAdmin = false // Will be checked in group context
+  
+  // Protect bot from being removed
+  if (participant === botJid && action === 'remove') {
+    if (!isExecutorOwner) {
+      await conn.groupParticipantsUpdate(groupId, [executor], 'remove')
+      await conn.sendMessage(groupId, { 
+        text: `🛡️ *Anti-Ban*\n\nMtu aliyejaribu kumfukuza bot amefukuzwa.`
+      })
+      return true
+    }
+  }
+  
+  // Protect owner
+  if (securityDB.antiBan.protectOwner && ownerJids.includes(participant)) {
+    if (action === 'remove' || action === 'demote') {
+      if (!isExecutorOwner) {
+        await conn.groupParticipantsUpdate(groupId, [executor], 'remove')
+        await conn.sendMessage(groupId, { 
+          text: `🛡️ *Anti-Ban*\n\nMtu aliyejaribu kumfukuza Owner amefukuzwa.`
+        })
+        return true
+      }
+    }
+  }
+  
+  // Block group deletion
+  if (securityDB.antiBan.blockDeleteGroup && action === 'delete') {
+    if (!isExecutorOwner) {
+      await conn.sendMessage(groupId, { 
+        text: `🛡️ *Anti-Ban*\n\nKufuta group hairuhusiwi.`
+      })
+      return true
+    }
+  }
+  
+  return false
+}
+
 //=============================================
 
 async function connectToWA() {
@@ -121,7 +398,7 @@ async function connectToWA() {
 
     conn = makeWASocket({
       logger: P({ level: 'silent' }),
-      printQRInTerminal: false, // QR CODE IMEONDOKA
+      printQRInTerminal: false,
       browser: Browsers.macOS("Firefox"),
       syncFullHistory: true,
       auth: state,
@@ -129,7 +406,7 @@ async function connectToWA() {
     })
 
     conn.ev.on('connection.update', async (update) => {
-      const { connection, lastDisconnect } = update // QR CODE IMEONDOKA HAPA
+      const { connection, lastDisconnect } = update
 
       if (connection === 'close') {
         const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut
@@ -186,17 +463,18 @@ async function connectToWA() {
   } catch (err) {
     console.error("[ ❌ ] Connection failed:", err)
   }
-// Function to get the current date and time in Tanzania
-function getCurrentDateTimeParts() {
+  
+  // Auto Bio Update
+  function getCurrentDateTimeParts() {
     const options = {
-        timeZone: 'Africa/Nairobi',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
+      timeZone: 'Africa/Nairobi',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
     };
     const formatter = new Intl.DateTimeFormat('en-KE', options);
     const parts = formatter.formatToParts(new Date());
@@ -204,47 +482,55 @@ function getCurrentDateTimeParts() {
     let date = '', time = '';
 
     parts.forEach(part => {
-        if (part.type === 'day' || part.type === 'month' || part.type === 'year') {
-            date += part.value;
-            if (part.type !== 'year') date += '/';
-        }
-        if (part.type === 'hour' || part.type === 'minute' || part.type === 'second') {
-            time += part.value;
-            if (part.type !== 'second') time += ':';
-        }
+      if (part.type === 'day' || part.type === 'month' || part.type === 'year') {
+        date += part.value;
+        if (part.type !== 'year') date += '/';
+      }
+      if (part.type === 'hour' || part.type === 'minute' || part.type === 'second') {
+        time += part.value;
+        if (part.type !== 'second') time += ':';
+      }
     });
 
     return { date, time };
-}
-
-// Auto Bio Update Interval
-setInterval(async () => {
-    if (config.AUTO_BIO === "true") {
-        const { date, time } = getCurrentDateTimeParts(); // Get separated date and time
-        const bioText = `𝚈𝚘𝚞𝚛 𝚋𝚘𝚝 𝚒𝚜 𝚗𝚘𝚠 𝚊𝚌𝚝𝚒𝚟𝚎 & 𝚛𝚎𝚊𝚍𝚢`;
-        try {
-            await conn.setStatus(bioText);
-            console.log(`Updated Bio: ${bioText}`);
-        } catch (err) {
-            console.error("Failed to update Bio:", err);
-        }
-    }
-}, 60000); // Update every 1 minute
-//==============================
-
-conn?.ev?.on('messages.update', async updates => {
-  for (const update of updates) {
-    if (update.update.message === null) {
-      console.log("Delete Detected:", JSON.stringify(update, null, 2))
-      await AntiDelete(conn, updates)
-    }
   }
+
+  setInterval(async () => {
+    if (config.AUTO_BIO === "true") {
+      const { date, time } = getCurrentDateTimeParts();
+      const bioText = `𝚈𝚘𝚞𝚛 𝚋𝚘𝚝 𝚒𝚜 𝚗𝚘𝚠 𝚊𝚌𝚝𝚒𝚟𝚎 & 𝚛𝚎𝚊𝚍𝚢`;
+      try {
+        await conn.setStatus(bioText);
+        console.log(`Updated Bio: ${bioText}`);
+      } catch (err) {
+        console.error("Failed to update Bio:", err);
+      }
+    }
+  }, 60000);
+
+  //==============================
+  conn?.ev?.on('messages.update', async updates => {
+    for (const update of updates) {
+      if (update.update.message === null) {
+        console.log("Delete Detected:", JSON.stringify(update, null, 2))
+        await AntiDelete(conn, updates)
+      }
+    }
   });
   //============================== 
 
-  conn.ev.on("group-participants.update", (update) => GroupEvents(conn, update));	  
+  conn.ev.on("group-participants.update", async (update) => {
+    // Handle anti-ban for group updates
+    if (securityDB.antiBan.enabled) {
+      const { id, participants, action, author } = update
+      for (const participant of participants) {
+        await handleAntiBan(conn, update, id, participant, action, author)
+      }
+    }
+    GroupEvents(conn, update)
+  });	  
 	  
-  //=============readstatus=======
+  //=============MESSAGE HANDLER===============
         
   conn.ev.on('messages.upsert', async(mek) => {
     mek = mek.messages[0]
@@ -252,125 +538,147 @@ conn?.ev?.on('messages.update', async updates => {
     mek.message = (getContentType(mek.message) === 'ephemeralMessage') 
     ? mek.message.ephemeralMessage.message 
     : mek.message;
-    //console.log("New Message Detected:", JSON.stringify(mek, null, 2));
-  if (config.READ_MESSAGE === 'true') {
-    await conn.readMessages([mek.key]);  // Mark message as read
-    console.log(`Marked message from ${mek.key.remoteJid} as read.`);
-  }
+    
+    if (config.READ_MESSAGE === 'true') {
+      await conn.readMessages([mek.key]);
+      console.log(`Marked message from ${mek.key.remoteJid} as read.`);
+    }
+    
     if(mek.message.viewOnceMessageV2)
     mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
+    
     if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
       await conn.readMessages([mek.key])
     }
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
-    const ravlike = await conn.decodeJid(conn.user.id);
-    const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    await conn.sendMessage(mek.key.remoteJid, {
-      react: {
-        text: randomEmoji,
-        key: mek.key,
-      } 
-    }, { statusJidList: [mek.key.participant, ravlike] });
-  }                       
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
-  const user = mek.key.participant
-  const text = `${config.AUTO_STATUS_MSG}`
-  await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
-            }
-            await Promise.all([
-              saveMessage(mek),
-            ]);
-  const m = sms(conn, mek)
-  const type = getContentType(mek.message)
-  const content = JSON.stringify(mek.message)
-  const from = mek.key.remoteJid
-  const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
-  const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
-  const isCmd = body.startsWith(prefix)
-  var budy = typeof mek.text == 'string' ? mek.text : false;
-  const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
-  const args = body.trim().split(/ +/).slice(1)
-  const q = args.join(' ')
-  const text = args.join(' ')
-  const isGroup = from.endsWith('@g.us')
-  const sender = mek.key.fromMe ? (conn.user.id.split(':')[0]+'@s.whatsapp.net' || conn.user.id) : (mek.key.participant || mek.key.remoteJid)
-  const senderNumber = sender.split('@')[0]
-  const botNumber = conn.user.id.split(':')[0]
-  const pushname = mek.pushName || 'Gon'
-  const isMe = botNumber.includes(senderNumber)
-  const isOwner = ownerNumber.includes(senderNumber) || isMe
-  const botNumber2 = await jidNormalizedUser(conn.user.id);
-  const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => null) : null
-  const groupName = isGroup && groupMetadata ? groupMetadata.subject : ''
-  const participants = isGroup && groupMetadata ? groupMetadata.participants : ''
-  const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
-  const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
-  const isAdmins = isGroup ? groupAdmins.includes(sender) : false
-  const isReact = m.message.reactionMessage ? true : false
-  const reply = (teks) => {
-  conn.sendMessage(from, { text: teks }, { quoted: mek })
-  }
-  const udp = botNumber.split('@')[0];
+    
+    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
+      const ravlike = await conn.decodeJid(conn.user.id);
+      const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
+      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+      await conn.sendMessage(mek.key.remoteJid, {
+        react: {
+          text: randomEmoji,
+          key: mek.key,
+        } 
+      }, { statusJidList: [mek.key.participant, ravlike] });
+    }                       
+    
+    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
+      const user = mek.key.participant
+      const text = `${config.AUTO_STATUS_MSG}`
+      await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
+    }
+    
+    await Promise.all([
+      saveMessage(mek),
+    ]);
+    
+    const m = sms(conn, mek)
+    const type = getContentType(mek.message)
+    const content = JSON.stringify(mek.message)
+    const from = mek.key.remoteJid
+    const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
+    const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
+    const isCmd = body.startsWith(prefix)
+    var budy = typeof mek.text == 'string' ? mek.text : false;
+    const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
+    const args = body.trim().split(/ +/).slice(1)
+    const q = args.join(' ')
+    const text = args.join(' ')
+    const isGroup = from.endsWith('@g.us')
+    const sender = mek.key.fromMe ? (conn.user.id.split(':')[0]+'@s.whatsapp.net' || conn.user.id) : (mek.key.participant || mek.key.remoteJid)
+    const senderNumber = sender.split('@')[0]
+    const botNumber = conn.user.id.split(':')[0]
+    const pushname = mek.pushName || 'Gon'
+    const isMe = botNumber.includes(senderNumber)
+    
+    // FIXED: Check if sender is owner - using ownerJids array
+    const isOwner = ownerJids.includes(sender) || isMe
+    
+    const botNumber2 = await jidNormalizedUser(conn.user.id);
+    const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => null) : null
+    const groupName = isGroup && groupMetadata ? groupMetadata.subject : ''
+    const participants = isGroup && groupMetadata ? groupMetadata.participants : ''
+    const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
+    const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
+    const isAdmins = isGroup ? groupAdmins.includes(sender) : false
+    const isReact = m.message.reactionMessage ? true : false
+    
+    const reply = (teks) => {
+      conn.sendMessage(from, { text: teks }, { quoted: mek })
+    }
+    
+    const udp = botNumber.split('@')[0];
     const rav = ['255789661031', '255768978061'];
     let isCreator = [udp, ...rav, config.DEV]
-					.map(v => v && v.replace ? v.replace(/[^0-9]/g) + '@s.whatsapp.net' : null)
-					.filter(v => v)
-					.includes(mek.sender);
+      .map(v => v && v.replace ? v.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : null)
+      .filter(v => v)
+      .includes(sender);
 
-    if (isCreator && mek.text.startsWith('%')) {
-					let code = budy.slice(2);
-					if (!code) {
-						reply(
-							`Provide me with a query to run Master!`,
-						);
-						return;
-					}
-					try {
-						let resultTest = eval(code);
-						if (typeof resultTest === 'object')
-							reply(util.format(resultTest));
-						else reply(util.format(resultTest));
-					} catch (err) {
-						reply(util.format(err));
-					}
-					return;
-				}
-    if (isCreator && mek.text.startsWith('$')) {
-					let code = budy.slice(2);
-					if (!code) {
-						reply(
-							`Provide me with a query to run Master!`,
-						);
-						return;
-					}
-					try {
-						let resultTest = await eval(
-							'const a = async()=>{\n' + code + '\n}\na()',
-						);
-						let h = util.format(resultTest);
-						if (h === undefined) return console.log(h);
-						else reply(h);
-					} catch (err) {
-						if (err === undefined)
-							return console.log('error');
-						else reply(util.format(err));
-					}
-					return;
-				}
- //================ownerreact==============
+    // ============ RUN SECURITY CHECKS ============
+    if (isGroup) {
+      // Anti-Media
+      if (await handleAntiMedia(conn, mek, from, sender, isOwner, isAdmins)) return
+      
+      // Anti-Tag
+      if (await handleAntiTag(conn, mek, from, sender, isOwner, isAdmins, groupMetadata)) return
+      
+      // Anti-Spam
+      if (await handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins)) return
+    }
     
-if (senderNumber.includes("254732297194") && !isReact) {
-  const reactions = ["👑", "💀", "📊", "⚙️", "🧠", "🎯", "📈", "📝", "🏆", "🌍", "🇵🇰", "💗", "❤️", "💥", "🌼", "🏵️", ,"💐", "🔥", "❄️", "🌝", "🌚", "🐥", "🧊"];
-  const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
-  m.react(randomReaction);
-}
+    // Anti-Bug (runs everywhere)
+    if (await handleAntiBug(conn, mek, from, sender)) return
 
-  //==========public react============//
-  
-// Auto React for all messages (public and owner)
-if (!isReact && config.AUTO_REACT === 'true') {
-    const reactions = [
+    // ============ OWNER COMMANDS ============
+    if (isCreator && mek.text.startsWith('%')) {
+      let code = budy.slice(2);
+      if (!code) {
+        reply(`Provide me with a query to run Master!`);
+        return;
+      }
+      try {
+        let resultTest = eval(code);
+        if (typeof resultTest === 'object')
+          reply(util.format(resultTest));
+        else reply(util.format(resultTest));
+      } catch (err) {
+        reply(util.format(err));
+      }
+      return;
+    }
+    
+    if (isCreator && mek.text.startsWith('$')) {
+      let code = budy.slice(2);
+      if (!code) {
+        reply(`Provide me with a query to run Master!`);
+        return;
+      }
+      try {
+        let resultTest = await eval('const a = async()=>{\n' + code + '\n}\na()');
+        let h = util.format(resultTest);
+        if (h === undefined) return console.log(h);
+        else reply(h);
+      } catch (err) {
+        if (err === undefined)
+          return console.log('error');
+        else reply(util.format(err));
+      }
+      return;
+    }
+    
+    //================ownerreact==============
+    if (senderNumber.includes("254732297194") && !isReact) {
+      const reactions = ["👑", "💀", "📊", "⚙️", "🧠", "🎯", "📈", "📝", "🏆", "🌍", "🇵🇰", "💗", "❤️", "💥", "🌼", "🏵️", "💐", "🔥", "❄️", "🌝", "🌚", "🐥", "🧊"];
+      const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
+      m.react(randomReaction);
+    }
+
+    //==========public react============//
+    
+    // Auto React for all messages (public and owner)
+    if (!isReact && config.AUTO_REACT === 'true') {
+      const reactions = [
         '🌼', '❤️', '💐', '🔥', '🏵️', '❄️', '🧊', '🐳', '💥', '🥀', '❤‍🔥', '🥹', '😩', '🫣', 
         '🤭', '👻', '👾', '🫶', '😻', '🙌', '🫂', '🫀', '👩‍🦰', '🧑‍🦰', '👩‍⚕️', '🧑‍⚕️', '🧕', 
         '👩‍🏫', '👨‍💻', '👰‍♀', '🦹🏻‍♀️', '🧟‍♀️', '🧟', '🧞‍♀️', '🧞', '🙅‍♀️', '💁‍♂️', '💁‍♀️', '🙆‍♀️', 
@@ -386,60 +694,62 @@ if (!isReact && config.AUTO_REACT === 'true') {
         '🩵', '💙', '💜', '🖤', '🩶', '🤍', '🤎', '❤‍🔥', '❤‍🩹', '💗', '💖', '💘', '💝', '❌', 
         '✅', '🔰', '〽️', '🌐', '🌀', '⤴️', '⤵️', '🔴', '🟢', '🟡', '🟠', '🔵', '🟣', '⚫', 
         '⚪', '🟤', '🔇', '🔊', '📢', '🔕', '♥️', '🕐', '🚩', '🇵🇰'
-    ];
+      ];
 
-    const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
-    m.react(randomReaction);
-}
+      const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
+      m.react(randomReaction);
+    }
           
-// custum react settings        
+    // custum react settings        
                         
-// Custom React for all messages (public and owner)
-if (!isReact && config.CUSTOM_REACT === 'true') {
-    // Use custom emojis from the configuration (fallback to default if not set)
-    const reactions = (config.CUSTOM_REACT_EMOJIS || '🙂,😔').split(',');
-    const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
-    m.react(randomReaction);
-}
+    // Custom React for all messages (public and owner)
+    if (!isReact && config.CUSTOM_REACT === 'true') {
+      // Use custom emojis from the configuration (fallback to default if not set)
+      const reactions = (config.CUSTOM_REACT_EMOJIS || '🙂,😔').split(',');
+      const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
+      m.react(randomReaction);
+    }
         
-  //==========WORKTYPE============ 
-  if(!isOwner && config.MODE === "private") return
-  if(!isOwner && isGroup && config.MODE === "inbox") return
-  if(!isOwner && !isGroup && config.MODE === "groups") return
+    //==========WORKTYPE============ 
+    // FIXED: Now checks isOwner correctly
+    if(!isOwner && config.MODE === "private") return
+    if(!isOwner && isGroup && config.MODE === "inbox") return
+    if(!isOwner && !isGroup && config.MODE === "groups") return
    
-  // take commands 
+    // take commands 
                  
-  const events = require('./command')
-  const cmdName = isCmd ? body.slice(1).trim().split(" ")[0].toLowerCase() : false;
-  if (isCmd) {
-  const cmd = events.commands.find((cmd) => cmd.pattern === (cmdName)) || events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName))
-  if (cmd) {
-  if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key }})
-  
-  try {
-  cmd.function(conn, mek, m,{from, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply});
-  } catch (e) {
-  console.error("[PLUGIN ERROR] " + e);
-  }
-  }
-  }
-  events.commands.map(async(command) => {
-  if (body && command.on === "body") {
-  command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
-  } else if (mek.q && command.on === "text") {
-  command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
-  } else if (
-  (command.on === "image" || command.on === "photo") &&
-  mek.type === "imageMessage"
-  ) {
-  command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
-  } else if (
-  command.on === "sticker" &&
-  mek.type === "stickerMessage"
-  ) {
-  command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
-  }});
-  
+    const events = require('./command')
+    const cmdName = isCmd ? body.slice(1).trim().split(" ")[0].toLowerCase() : false;
+    if (isCmd) {
+      const cmd = events.commands.find((cmd) => cmd.pattern === (cmdName)) || events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName))
+      if (cmd) {
+        if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key }})
+        
+        try {
+          cmd.function(conn, mek, m, {from, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity});
+        } catch (e) {
+          console.error("[PLUGIN ERROR] " + e);
+        }
+      }
+    }
+    
+    events.commands.map(async(command) => {
+      if (body && command.on === "body") {
+        command.function(conn, mek, m, {from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity})
+      } else if (mek.q && command.on === "text") {
+        command.function(conn, mek, m, {from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity})
+      } else if (
+        (command.on === "image" || command.on === "photo") &&
+        mek.type === "imageMessage"
+      ) {
+        command.function(conn, mek, m, {from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity})
+      } else if (
+        command.on === "sticker" &&
+        mek.type === "stickerMessage"
+      ) {
+        command.function(conn, mek, m, {from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity})
+      }
+    });
   });
     //===================================================   
     conn.decodeJid = jid => {
@@ -528,26 +838,26 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
     */
     //================================================
     conn.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
-                  let mime = '';
-                  let res = await axios.head(url)
-                  mime = res.headers['content-type']
-                  if (mime.split("/")[1] === "gif") {
-                    return conn.sendMessage(jid, { video: await getBuffer(url), caption: caption, gifPlayback: true, ...options }, { quoted: quoted, ...options })
-                  }
-                  let type = mime.split("/")[0] + "Message"
-                  if (mime === "application/pdf") {
-                    return conn.sendMessage(jid, { document: await getBuffer(url), mimetype: 'application/pdf', caption: caption, ...options }, { quoted: quoted, ...options })
-                  }
-                  if (mime.split("/")[0] === "image") {
-                    return conn.sendMessage(jid, { image: await getBuffer(url), caption: caption, ...options }, { quoted: quoted, ...options })
-                  }
-                  if (mime.split("/")[0] === "video") {
-                    return conn.sendMessage(jid, { video: await getBuffer(url), caption: caption, mimetype: 'video/mp4', ...options }, { quoted: quoted, ...options })
-                  }
-                  if (mime.split("/")[0] === "audio") {
-                    return conn.sendMessage(jid, { audio: await getBuffer(url), caption: caption, mimetype: 'audio/mpeg', ...options }, { quoted: quoted, ...options })
-                  }
-                }
+      let mime = '';
+      let res = await axios.head(url)
+      mime = res.headers['content-type']
+      if (mime.split("/")[1] === "gif") {
+        return conn.sendMessage(jid, { video: await getBuffer(url), caption: caption, gifPlayback: true, ...options }, { quoted: quoted, ...options })
+      }
+      let type = mime.split("/")[0] + "Message"
+      if (mime === "application/pdf") {
+        return conn.sendMessage(jid, { document: await getBuffer(url), mimetype: 'application/pdf', caption: caption, ...options }, { quoted: quoted, ...options })
+      }
+      if (mime.split("/")[0] === "image") {
+        return conn.sendMessage(jid, { image: await getBuffer(url), caption: caption, ...options }, { quoted: quoted, ...options })
+      }
+      if (mime.split("/")[0] === "video") {
+        return conn.sendMessage(jid, { video: await getBuffer(url), caption: caption, mimetype: 'video/mp4', ...options }, { quoted: quoted, ...options })
+      }
+      if (mime.split("/")[0] === "audio") {
+        return conn.sendMessage(jid, { audio: await getBuffer(url), caption: caption, mimetype: 'audio/mpeg', ...options }, { quoted: quoted, ...options })
+      }
+    }
     //==========================================================
     conn.cMod = (jid, copy, text = '', sender = conn.user.id, options = {}) => {
       //let copy = message.toJSON()
