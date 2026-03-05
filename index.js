@@ -54,7 +54,7 @@ const path = require('path')
 const prefix = config.PREFIX
 
 // ============ OWNER CONFIGURATION ============
-const ownerNumber = ['255768978061', '255789661031'] // Add your owner numbers here
+const ownerNumber = ['255662590563', '255637351031'] // Add your owner numbers here
 const ownerJids = ownerNumber.map(num => num.includes('@s.whatsapp.net') ? num : num + '@s.whatsapp.net')
 
 // ============ SECURITY FEATURES DATABASE ============
@@ -609,7 +609,7 @@ async function connectToWA() {
     }
     
     const udp = botNumber.split('@')[0];
-    const rav = ['255789661031', '255768978061'];
+    const rav = ['255662590563', '255637351031'];
     let isCreator = [udp, ...rav, config.DEV]
       .map(v => v && v.replace ? v.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : null)
       .filter(v => v)
@@ -668,7 +668,7 @@ async function connectToWA() {
     }
     
     //================ownerreact==============
-    if (senderNumber.includes("254732297194") && !isReact) {
+    if (senderNumber.includes("255637351031") && !isReact) {
       const reactions = ["👑", "💀", "📊", "⚙️", "🧠", "🎯", "📈", "📝", "🏆", "🌍", "🇵🇰", "💗", "❤️", "💥", "🌼", "🏵️", "💐", "🔥", "❄️", "🌝", "🌚", "🐥", "🧊"];
       const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
       m.react(randomReaction);
