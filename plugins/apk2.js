@@ -1,5 +1,5 @@
 const { cmd } = require("../command");
-const axios = require('axios');
+const axios = require("axios");
 
 // FakevCard sawa na zilizopita
 const fkontak = {
@@ -32,8 +32,8 @@ const processedMessages = new Set();
 cmd(
   {
     pattern: "apk",
-    alias: ["playstore", "modapk", "app"],
-    desc: "Search and download APK files from Play Store",
+    alias: ["app", "downloadapk", "androidapp"],
+    desc: "Download APK files from Google Play Store",
     category: "download",
     react: "📱",
     filename: __filename,
@@ -46,66 +46,92 @@ cmd(
 
       if (!q) {
         return await conn.sendMessage(from, { 
-          text: "👉 *𝙿𝚕𝚎𝚊𝚜𝚎 𝚙𝚛𝚘𝚟𝚒𝚍𝚎 𝚊𝚙𝚙 𝚗𝚊𝚖𝚎*\n\n𝙴𝚡𝚊𝚖𝚙𝚕𝚎: *.apk whatsapp*\n.playstore facebook\n.modapk spotify\n\n> © Powered by Sila Tech", 
+          text: "👉 *𝙿𝚕𝚎𝚊𝚜𝚎 𝚙𝚛𝚘𝚟𝚒𝚍𝚎 𝚊𝚗 𝚊𝚙𝚙 𝙸𝙳*\n\n*Example:* .apk com.whatsapp\n*Example:* .apk com.instagram.android\n\n> © Powered by Sila Tech", 
           contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
       }
 
-      await conn.sendMessage(from, { react: { text: "🔍", key: m.key } });
+      await conn.sendMessage(from, { react: { text: "⏳", key: m.key } });
 
-      // Search APK
-      const searchResponse = await axios.get(`https://api.bk9.dev/search/apk?q=${encodeURIComponent(q)}`);
-      const apps = searchResponse.data?.data || searchResponse.data?.results;
-
-      if (!apps || apps.length === 0) {
-        await conn.sendMessage(from, { 
-          text: "❌ *𝙽𝚘 𝚊𝚙𝚙𝚜 𝚏𝚘𝚞𝚗𝚍.* 𝚃𝚛𝚢 𝚍𝚒𝚏𝚏𝚎𝚛𝚎𝚗𝚝 𝚜𝚎𝚊𝚛𝚌𝚑 𝚝𝚎𝚛𝚖.\n\n> © Powered by Sila Tech", 
+      // Clean the input - remove any extra spaces or URLs
+      const packageName = q.trim().replace(/https?:\/\/play\.google\.com\/store\/apps\/details\?id=/, '');
+      
+      // API request
+      const apiUrl = `https://api.bk9.dev/download/apk?id=${encodeURIComponent(packageName)}`;
+      const response = await axios.get(apiUrl);
+      
+      if (!response.data || !response.data.status) {
+        return await conn.sendMessage(from, { 
+          text: `❌ *𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚏𝚎𝚝𝚌𝚑 𝚊𝚙𝚙*\n\n𝚁𝚎𝚊𝚜𝚘𝚗: ${response.data?.message || 'Invalid package name or app not found'}\n\n> © Powered by Sila Tech`, 
           contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
-        await conn.sendMessage(from, { react: { text: "❌", key: m.key } });
-        return;
       }
 
-      const app = apps[0];
-      const appId = app.package || app.id;
+      const appData = response.data.data;
+      
+      // Check if download URL exists
+      if (!appData.download) {
+        return await conn.sendMessage(from, { 
+          text: "❌ *𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍 𝚄𝚁𝙻 𝚗𝚘𝚝 𝚏𝚘𝚞𝚗𝚍*\n\n> © Powered by Sila Tech", 
+          contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
+      }
 
-      if (appId) {
-        // Download APK
-        const downloadResponse = await axios.get(`https://api.bk9.dev/download/apk?id=${encodeURIComponent(appId)}`);
-        const downloadUrl = downloadResponse.data?.url || downloadResponse.data?.downloadUrl;
+      // Prepare app info message
+      const appInfo = `
+📱 *𝙰𝙿𝙺 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚎𝚛*
 
-        if (downloadUrl) {
-          await conn.sendMessage(from, {
-            document: { url: downloadUrl },
-            fileName: `${app.name || q}.apk`,
-            mimetype: 'application/vnd.android.package-archive',
-            caption: `📱 *${app.name || q}*\n\n📦 *Package:* ${appId}\n🔄 *Version:* ${app.version || 'N/A'}\n📊 *Size:* ${app.size || 'N/A'}\n\n✨ *𝙰𝙿𝙺 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚎𝚛 𝚋𝚢 𝚂𝙸𝙻𝙰 𝙼𝙳*\n\n> © Powered by Sila Tech`,
-            contextInfo: getContextInfo({ sender: sender })
-          }, { quoted: fkontak });
-          
-          await conn.sendMessage(from, { react: { text: "✅", key: m.key } });
-        } else {
-          await conn.sendMessage(from, { 
-            text: `📱 *𝙰𝚙𝚙 𝙵𝚘𝚞𝚗𝚍:* ${app.name}\n\n📦 *Package:* ${appId}\n🔄 *Version:* ${app.version || 'N/A'}\n📊 *Size:* ${app.size || 'N/A'}\n\n❌ *𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍 𝚕𝚒𝚗𝚔 𝚗𝚘𝚝 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎*\n\n> © Powered by Sila Tech`, 
-            contextInfo: getContextInfo({ sender: sender })
-          }, { quoted: fkontak });
-          await conn.sendMessage(from, { react: { text: "❌", key: m.key } });
-        }
+*𝙰𝚙𝚙 𝙽𝚊𝚖𝚎:* ${appData.name || 'N/A'}
+*𝙿𝚊𝚌𝚔𝚊𝚐𝚎:* ${appData.packageName || packageName}
+*𝚅𝚎𝚛𝚜𝚒𝚘𝚗:* ${appData.version || 'N/A'}
+*𝚂𝚒𝚣𝚎:* ${appData.size || 'Unknown'}
+*𝙳𝚎𝚟𝚎𝚕𝚘𝚙𝚎𝚛:* ${appData.developer || 'N/A'}
+
+⬇️ *𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚒𝚗𝚐...*
+
+> © Powered by Sila Tech
+      `;
+
+      // Send app info with thumbnail if available
+      if (appData.icon) {
+        await conn.sendMessage(from, {
+          image: { url: appData.icon },
+          caption: appInfo,
+          contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
       } else {
         await conn.sendMessage(from, { 
-          text: "❌ *𝙲𝚘𝚞𝚕𝚍 𝚗𝚘𝚝 𝚐𝚎𝚝 𝚊𝚙𝚙 𝚍𝚎𝚝𝚊𝚒𝚕𝚜*\n\n> © Powered by Sila Tech", 
+          text: appInfo,
           contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
-        await conn.sendMessage(from, { react: { text: "❌", key: m.key } });
       }
 
-    } catch (e) {
-      console.error(e);
-      await conn.sendMessage(from, { 
-        text: `⚠️ *𝙴𝚛𝚛𝚘𝚛:* ${e.message}\n\n> © Powered by Sila Tech`, 
+      // Send the APK file
+      await conn.sendMessage(from, {
+        document: { url: appData.download },
+        mimetype: "application/vnd.android.package-archive",
+        fileName: `${appData.name || 'app'}_${appData.version || 'latest'}.apk`,
+        caption: `✅ *${appData.name || 'App'} downloaded successfully*\n\n> © Powered by Sila Tech`,
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
-      await conn.sendMessage(from, { react: { text: "❌", key: m.key } });
+
+      await conn.sendMessage(from, { react: { text: "✅", key: m.key } });
+
+    } catch (e) {
+      console.error("APK Download Error:", e);
+      
+      // Handle specific error cases
+      let errorMessage = e.message;
+      if (e.response?.status === 404) {
+        errorMessage = "App not found. Make sure the package name is correct.";
+      } else if (e.code === 'ECONNREFUSED') {
+        errorMessage = "Connection to API server failed.";
+      }
+
+      await conn.sendMessage(from, { 
+        text: `⚠️ *𝙴𝚛𝚛𝚘𝚛:* ${errorMessage}\n\n*Example:* .apk com.whatsapp\n\n> © Powered by Sila Tech`, 
+        contextInfo: getContextInfo({ sender: sender })
+      }, { quoted: fkontak });
     }
   }
 );
