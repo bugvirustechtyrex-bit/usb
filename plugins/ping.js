@@ -17,7 +17,7 @@ const fakevCard = {
 
 cmd({
     pattern: "ping",
-    alias: ['p'],
+    alias: ["p"],
     desc: "Check bot speed",
     category: "main",
     react: "🚀",
