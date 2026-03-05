@@ -37,8 +37,8 @@ const getContextInfo = (m, ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃", formattedOwn
 };
 
 cmd({
-    pattern: "apk",
-    alias: ["app"],
+    pattern: "apk2",
+    alias: ["app2"],
     react: "📲",
     desc: "Download APK directly",
     category: "download",
@@ -84,3 +84,4 @@ async (conn, mek, m, { from, q, sender }) => {
     }
 
 });
+
