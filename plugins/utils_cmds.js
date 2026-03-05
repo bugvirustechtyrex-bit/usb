@@ -7,7 +7,7 @@ const os = require('os');
 // ==================== LUCHA (Import from your language system) ====================
 // Make sure this path matches your language file location
 let userLanguages = {};
-const langDbPath = path.join(__dirname, '../database/user_lang.json');
+const langDbPath = path.join(__dirname, '../data/user_lang.json');
 const languages = require('../lib/languages');
 
 // Load user languages
