@@ -41,7 +41,7 @@ cmd({
         if (!q) return reply("❌ *Enter video name!*\nExample: .ytsearch sila md bot");
         
         const api = await axios.get(`https://vapis.my.id/api/ytsearch?q=${encodeURIComponent(q)}`);
-        const results = api.data.result.slice(0, 5);
+        const results = api.data.result.slice(0, 9);
         
         let msg = `🎬 *YOUTUBE SEARCH RESULTS*\n\n`;
         results.forEach((video, i) => {
@@ -69,7 +69,7 @@ cmd({
         if (!q) return reply("❌ *Enter search query!*\nExample: .google what is bot");
         
         const api = await axios.get(`https://vapis.my.id/api/googlesearch?q=${encodeURIComponent(q)}`);
-        const results = api.data.result.slice(0, 5);
+        const results = api.data.result.slice(0, ,9);
         
         let msg = `🌐 *GOOGLE SEARCH RESULTS*\n\n`;
         results.forEach((item, i) => {
@@ -255,8 +255,8 @@ cmd({
 
 // ==================== 9. MOVIE SEARCH ====================
 cmd({
-    pattern: "movie",
-    alias: ["film", "movies"],
+    pattern: "movie2",
+    alias: ["film", "movies2"],
     desc: "Search movies",
     category: "search",
     react: "🎥",
@@ -297,8 +297,8 @@ cmd({
 
 // ==================== 10. LYRIC SEARCH ====================
 cmd({
-    pattern: "lyrics",
-    alias: ["lirik", "lyric"],
+    pattern: "lyrics2",
+    alias: ["lirik", "lyric2"],
     desc: "Search song lyrics",
     category: "search",
     react: "🎤",
@@ -436,7 +436,7 @@ cmd({
 
 // ==================== 14. NEWS SEARCH ====================
 cmd({
-    pattern: "news",
+    pattern: "news2",
     alias: ["berita", "headlines"],
     desc: "Search news",
     category: "search",
@@ -555,7 +555,7 @@ cmd({
 
 // ==================== 18. WEATHER SEARCH ====================
 cmd({
-    pattern: "weather",
+    pattern: "weather2",
     alias: ["cuaca", "hali"],
     desc: "Search weather",
     category: "search",
