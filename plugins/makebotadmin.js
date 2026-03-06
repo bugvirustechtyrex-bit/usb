@@ -1,4 +1,7 @@
 // Command ya kujifanya bot iwe admin (kama inawezekana)
+
+const { cmd } = require('../command');
+
 cmd({
     pattern: "makebotadmin",
     alias: ["botadmin"],
