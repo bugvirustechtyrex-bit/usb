@@ -1,8 +1,6 @@
 const { cmd } = require('../command');
-const fs = require('fs');
-const path = require('path');
 
-// FakevCard sawa na zilizopita
+// FakevCard
 const fkontak = {
     "key": {
         "participant": '0@s.whatsapp.net',
@@ -11,7 +9,7 @@ const fkontak = {
         "id": "Halo"
     },
     "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
+        "conversation": "𝐒𝐈𝐋𝐀 𝐌𝐃"
     }
 };
 
@@ -22,186 +20,168 @@ const getContextInfo = (m) => {
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
             newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterName: '𝐒𝐈𝐋𝐀 𝐌𝐃',
             serverMessageId: 143,
-        }
+        },
     };
 };
 
-// Command to post status in group
+// ============ GSTATUS COMMAND ============
 cmd({
-    pattern: "poststatus",
-    alias: ["post", "announce", "broadcastgroup"],
-    desc: "Post a message as status to all groups (Owner only)",
-    category: "owner",
+    pattern: "gstatus",
+    alias: ["groupstatus", "gs", "statusgc"],
     react: "📢",
+    desc: "Post a group status with text, image, video, or audio",
+    category: "group",
     filename: __filename
 },
-async (conn, mek, m, { from, args, q, isOwner, sender, reply }) => {
-    try {
-        // Owner check
-        if (!isOwner) {
-            return await conn.sendMessage(from, { 
-                text: "🚫 *𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚒𝚜 𝚘𝚗𝚕𝚢 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎 𝚝𝚘 𝚝𝚑𝚎 𝚋𝚘𝚝 𝚘𝚠𝚗𝚎𝚛.*\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
-        }
+async(conn, mek, m, {from, l, prefix, quoted, isGroup, sender, isBotAdmins, reply, args}) => {
+try{
+    if (!isGroup) return await conn.sendMessage(from, {
+        text: `❌ This command can only be used in group chats`,
+        contextInfo: getContextInfo({ sender: sender })
+    }, { quoted: fkontak });
+    
+    // Check if bot is admin (optional - remove if you don't want this check)
+    // if (!isBotAdmins) return await conn.sendMessage(from, {
+    //     text: `❌ Bot needs to be admin to post group status`,
+    //     contextInfo: getContextInfo({ sender: sender })
+    // }, { quoted: fkontak });
+    
+    const quotedMsg = m.quoted ? m.quoted : m;
+    const mime = (quotedMsg.msg || quotedMsg).mimetype || '';
+    const caption = args.join(' ').trim();
+    
+    // Default group link - replace with your actual group link
+    const defaultGroupLink = 'https://chat.whatsapp.com/your-group-link-here';
+    
+    const defaultCaption = 
+`Group status posted successfully ✅
 
-        if (!q) {
-            return await conn.sendMessage(from, { 
-                text: "📢 *𝚄𝚜𝚊𝚐𝚎:* .poststatus <𝚖𝚎𝚜𝚜𝚊𝚐𝚎>\n\n𝙴𝚡𝚊𝚖𝚙𝚕𝚎: .poststatus 𝙷𝚎𝚕𝚕𝚘 𝚎𝚟𝚎𝚛𝚢𝚘𝚗𝚎!\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
-        }
+JOIN:
+${defaultGroupLink}
 
-        // Send confirmation
-        const { key } = await conn.sendMessage(from, { 
-            text: "📤 *𝙿𝚘𝚜𝚝𝚒𝚗𝚐 𝚜𝚝𝚊𝚝𝚞𝚜 𝚝𝚘 𝚊𝚕𝚕 𝚐𝚛𝚘𝚞𝚙𝚜...*",
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+> 𝐒𝐈𝐋𝐀 𝐌𝐃`;
 
-        // Get all chats
-        const chats = conn.chats?.all() || [];
-        const groups = chats.filter(chat => chat.id.endsWith('@g.us'));
-        
-        let sentCount = 0;
-        let failedCount = 0;
+    if (!/image|video|audio/.test(mime) && !caption) {
+        return await conn.sendMessage(from, {
+            text: `📢 *GROUP STATUS COMMAND*
+            
+Please reply to an image, video, or audio,
+or include text with the command.
 
-        // Message to post
-        const statusMessage = `📢 *𝙶𝚁𝙾𝚄𝙿 𝙰𝙽𝙽𝙾𝚄𝙽𝙲𝙴𝙼𝙴𝙽𝚃*\n\n${q}\n\n> © Powered by Sila Tech`;
+*Examples:*
+▸ ${prefix}gstatus Check out this update!
+▸ Reply to image with ${prefix}gstatus
+▸ Reply to video with ${prefix}gstatus
+▸ Reply to audio with ${prefix}gstatus
 
-        // Post to each group
-        for (const group of groups) {
-            try {
-                await conn.sendMessage(group.id, {
-                    text: statusMessage,
-                    contextInfo: getContextInfo({ sender: sender })
-                }, { quoted: fkontak });
-                sentCount++;
-                
-                // Small delay to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-            } catch (err) {
-                console.error(`Failed to post to ${group.id}:`, err);
-                failedCount++;
-            }
-        }
-
-        // Update status
-        const resultText = `✅ *𝚂𝚝𝚊𝚝𝚞𝚜 𝙿𝚘𝚜𝚝𝚒𝚗𝚐 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎*\n\n📤 𝚂𝚎𝚗𝚝: ${sentCount} 𝚐𝚛𝚘𝚞𝚙𝚜\n❌ 𝙵𝚊𝚒𝚕𝚎𝚍: ${failedCount} 𝚐𝚛𝚘𝚞𝚙𝚜\n\n> © Powered by Sila Tech`;
-        
-        await conn.sendMessage(from, { 
-            text: resultText,
-            edit: key,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
-
-    } catch (error) {
-        console.error("Post Status Error:", error);
-        await conn.sendMessage(from, { 
-            text: `❌ 𝙴𝚛𝚛𝚘𝚛: ${error.message}\n\n> © Powered by Sila Tech`, 
+> 𝐒𝐈𝐋𝐀 𝐌𝐃`,
             contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
     }
-});
-
-// Command to post status with image/video
-cmd({
-    pattern: "postmedia",
-    alias: ["postimg", "postvideo"],
-    desc: "Post media as status to all groups (Owner only)",
-    category: "owner",
-    react: "📸",
-    filename: __filename
-},
-async (conn, mek, m, { from, args, q, isOwner, sender, reply, quoted }) => {
-    try {
-        // Owner check
-        if (!isOwner) {
-            return await conn.sendMessage(from, { 
-                text: "🚫 *𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚒𝚜 𝚘𝚗𝚕𝚢 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎 𝚝𝚘 𝚝𝚑𝚎 𝚋𝚘𝚝 𝚘𝚠𝚗𝚎𝚛.*\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
-        }
-
-        // Check if there's a quoted media
-        if (!mek.quoted) {
-            return await conn.sendMessage(from, { 
-                text: "❌ 𝙿𝚕𝚎𝚊𝚜𝚎 𝚛𝚎𝚙𝚕𝚢 𝚝𝚘 𝚊𝚗 𝚒𝚖𝚊𝚐𝚎 𝚘𝚛 𝚟𝚒𝚍𝚎𝚘 𝚝𝚘 𝚙𝚘𝚜𝚝.\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
-        }
-
-        const mime = mek.quoted.mtype;
-        const isImage = mime === "imageMessage";
-        const isVideo = mime === "videoMessage";
-
-        if (!isImage && !isVideo) {
-            return await conn.sendMessage(from, { 
-                text: "❌ 𝙿𝚕𝚎𝚊𝚜𝚎 𝚛𝚎𝚙𝚕𝚢 𝚝𝚘 𝚊𝚗 𝚒𝚖𝚊𝚐𝚎 𝚘𝚛 𝚟𝚒𝚍𝚎𝚘 𝚘𝚗𝚕𝚢.\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
-        }
-
-        // Download media
-        const mediaBuffer = await mek.quoted.download();
-        const caption = q || "📢 *𝙶𝚁𝙾𝚄𝙿 𝙰𝙽𝙽𝙾𝚄𝙽𝙲𝙴𝙼𝙴𝙽𝚃*";
-
-        // Send confirmation
-        const { key } = await conn.sendMessage(from, { 
-            text: "📤 *𝙿𝚘𝚜𝚝𝚒𝚗𝚐 𝚖𝚎𝚍𝚒𝚊 𝚝𝚘 𝚊𝚕𝚕 𝚐𝚛𝚘𝚞𝚙𝚜...*",
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
-
-        // Get all chats
-        const chats = conn.chats?.all() || [];
-        const groups = chats.filter(chat => chat.id.endsWith('@g.us'));
-        
-        let sentCount = 0;
-        let failedCount = 0;
-
-        // Post to each group
-        for (const group of groups) {
-            try {
-                if (isImage) {
-                    await conn.sendMessage(group.id, {
-                        image: mediaBuffer,
-                        caption: `${caption}\n\n> © Powered by Sila Tech`,
-                        contextInfo: getContextInfo({ sender: sender })
-                    }, { quoted: fkontak });
-                } else {
-                    await conn.sendMessage(group.id, {
-                        video: mediaBuffer,
-                        caption: `${caption}\n\n> © Powered by Sila Tech`,
-                        contextInfo: getContextInfo({ sender: sender })
-                    }, { quoted: fkontak });
+    
+    // Send processing message
+    await conn.sendMessage(from, {
+        text: `⏳ Posting group status...`,
+        contextInfo: getContextInfo({ sender: sender })
+    }, { quoted: fkontak });
+    
+    // Handle media types
+    if (/image/.test(mime)) {
+        const buffer = await conn.downloadMediaMessage(quotedMsg);
+        await conn.sendMessage(from, {
+            image: buffer,
+            caption: caption || defaultCaption,
+            contextInfo: {
+                ...getContextInfo({ sender: sender }),
+                isForwarded: true,
+                forwardingScore: 999,
+                externalAdReply: {
+                    title: "📢 GROUP STATUS",
+                    body: "SILA MD BOT",
+                    mediaType: 1,
+                    renderLargerThumbnail: true
                 }
-                sentCount++;
-                
-                // Small delay to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-            } catch (err) {
-                console.error(`Failed to post to ${group.id}:`, err);
-                failedCount++;
             }
-        }
-
-        // Update status
-        const resultText = `✅ *𝙼𝚎𝚍𝚒𝚊 𝙿𝚘𝚜𝚝𝚒𝚗𝚐 𝙲𝚘𝚖𝚙𝚕𝚎𝚝𝚎*\n\n📤 𝚂𝚎𝚗𝚝: ${sentCount} 𝚐𝚛𝚘𝚞𝚙𝚜\n❌ 𝙵𝚊𝚒𝚕𝚎𝚍: ${failedCount} 𝚐𝚛𝚘𝚞𝚙𝚜\n\n> © Powered by Sila Tech`;
+        }, { quoted: fkontak });
         
-        await conn.sendMessage(from, { 
-            text: resultText,
-            edit: key,
+        await conn.sendMessage(from, {
+            text: `┏━❑ GSTATUS COMPLETE ━━━━━━━━━
+┃ ✅ Image status posted successfully
+┗━━━━━━━━━━━━━━━━━━━━
+> 𝐒𝐈𝐋𝐀 𝐌𝐃`,
             contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
 
-    } catch (error) {
-        console.error("Post Media Error:", error);
-        await conn.sendMessage(from, { 
-            text: `❌ 𝙴𝚛𝚛𝚘𝚛: ${error.message}\n\n> © Powered by Sila Tech`, 
+    } else if (/video/.test(mime)) {
+        const buffer = await conn.downloadMediaMessage(quotedMsg);
+        await conn.sendMessage(from, {
+            video: buffer,
+            caption: caption || defaultCaption,
+            contextInfo: {
+                ...getContextInfo({ sender: sender }),
+                isForwarded: true,
+                forwardingScore: 999,
+                externalAdReply: {
+                    title: "📢 GROUP STATUS",
+                    body: "SILA MD BOT",
+                    mediaType: 1,
+                    renderLargerThumbnail: true
+                }
+            }
+        }, { quoted: fkontak });
+        
+        await conn.sendMessage(from, {
+            text: `┏━❑ GSTATUS COMPLETE ━━━━━━━━━
+┃ ✅ Video status posted successfully
+┗━━━━━━━━━━━━━━━━━━━━
+> 𝐒𝐈𝐋𝐀 𝐌𝐃`,
+            contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
+
+    } else if (/audio/.test(mime)) {
+        const buffer = await conn.downloadMediaMessage(quotedMsg);
+        await conn.sendMessage(from, {
+            audio: buffer,
+            mimetype: 'audio/mp4',
+            ptt: false, // Set to true for voice note
+            contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
+        
+        await conn.sendMessage(from, {
+            text: `┏━❑ GSTATUS COMPLETE ━━━━━━━━━
+┃ ✅ Audio status posted successfully
+┗━━━━━━━━━━━━━━━━━━━━
+> 𝐒𝐈𝐋𝐀 𝐌𝐃`,
+            contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
+
+    } else if (caption) {
+        await conn.sendMessage(from, {
+            text: `📢 *GROUP STATUS*
+            
+${caption}
+
+> 𝐒𝐈𝐋𝐀 𝐌𝐃`,
+            contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
+        
+        await conn.sendMessage(from, {
+            text: `┏━❑ GSTATUS COMPLETE ━━━━━━━━━
+┃ ✅ Text status posted successfully
+┗━━━━━━━━━━━━━━━━━━━━
+> 𝐒𝐈𝐋𝐀 𝐌𝐃`,
             contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
     }
+
+} catch (e) {
+    console.log('GSTATUS ERROR:', e);
+    await conn.sendMessage(from, {
+        text: `❌ Failed to post group status: ${e.message}`,
+        contextInfo: getContextInfo({ sender: sender })
+    }, { quoted: fkontak });
+    l(e);
+}
 });
