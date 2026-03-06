@@ -51,7 +51,7 @@ cmd({
 	alias: ['ai', 'silaai', 'ask', 'query', 'gpt', 'silacop'],
 	react: '🤖',
 	desc: 'Ask AI Copilot anything',
-	category: 'main',
+	category: 'Ai',
 	filename: __filename
 },
 async (conn, mek, m, { from, sender, reply, q }) => {
@@ -178,4 +178,5 @@ async (conn, mek, m, { from, sender, reply, q }) => {
 		console.error('AIX error:', err);
 		reply(`❌ 𝙴𝚛𝚛𝚘𝚛 𝚙𝚘𝚌𝚎𝚜𝚜𝚒𝚖𝚐`, { quoted: fakevCard });
 	}
+
 });
