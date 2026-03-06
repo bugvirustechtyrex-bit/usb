@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Path za settings
-const SETTINGS_DIR = path.join(__dirname, '../Database');
+const SETTINGS_DIR = path.join(__dirname, '../data');
 const MENU_SETTINGS_FILE = path.join(SETTINGS_DIR, 'menusettings.json');
 
 // Hakikisha folder ipo
