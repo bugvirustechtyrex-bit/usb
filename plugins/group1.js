@@ -155,7 +155,7 @@ try{
 }
 });
 
-// ============ RGPP COMMAND (Reset Group Profile Picture) ============
+// ============ RGPP COMMAND (IMEREKEBISHWA - BILA BOT ADMIN CHECK) ============
 cmd({
     pattern: "rgpp",
     alias: ["resetpp", "removepp", "delpp"],
@@ -164,7 +164,7 @@ cmd({
     category: "group",
     filename: __filename
 },
-async(conn, mek, m, {from, l, isGroup, sender, isAdmins, isBotAdmins}) => {
+async(conn, mek, m, {from, l, isGroup, sender, isAdmins, reply}) => {
 try{
     if (!isGroup) return await conn.sendMessage(from, {
         text: `❌ This command is only for groups`,
@@ -176,28 +176,60 @@ try{
         contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fkontak });
     
-    // Remove group profile picture (set to default)
-    await conn.updateProfilePicture(from, { delete: true });
+    // TOA CHECK YA BOT ADMIN (SAWA KAMA PROMOTE/DEMOTE)
+    // if (!isBotAdmins) return await conn.sendMessage(from, {
+    //     text: `❌ Bot needs to be admin to remove group picture`,
+    //     contextInfo: getContextInfo({ sender: sender })
+    // }, { quoted: fkontak });
     
     await conn.sendMessage(from, {
-        text: `┏━❑ RGPP COMPLETE ━━━━━━━━━
+        text: `⏳ Removing group profile picture...`,
+        contextInfo: getContextInfo({ sender: sender })
+    }, { quoted: fkontak });
+    
+    try {
+        // First check if group has a picture
+        const ppUrl = await conn.profilePictureUrl(from, 'image').catch(() => null);
+        
+        if (!ppUrl) {
+            return await conn.sendMessage(from, {
+                text: `❌ Group doesn't have a profile picture`,
+                contextInfo: getContextInfo({ sender: sender })
+            }, { quoted: fkontak });
+        }
+        
+        // Remove group profile picture
+        await conn.removeProfilePicture(from);
+        
+        await conn.sendMessage(from, {
+            text: `┏━❑ RGPP COMPLETE ━━━━━━━━━
 ┃ ✅ Group profile picture has been removed
 ┃ 🖼️ Group now has default picture
 ┗━━━━━━━━━━━━━━━━━━━━`,
-        contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+            contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
+        
+    } catch (ppError) {
+        console.log('Profile picture error:', ppError);
+        
+        // Alternative method
+        await conn.sendMessage(from, {
+            text: `❌ Could not remove picture. Make sure bot has permissions.`,
+            contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
+    }
 
 } catch (e) {
     console.log('RGPP ERROR:', e);
     await conn.sendMessage(from, {
-        text: `❌ Failed to remove group picture: ${e.message}`,
+        text: `❌ Failed to remove group picture. Error: ${e.message}`,
         contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fkontak });
     l(e);
 }
 });
 
-// ============ CREATEGC COMMAND ============
+// ============ CREATEGC COMMAND (IMEREKEBISHWA) ============
 cmd({
     pattern: "creategc",
     alias: ["creategroup", "newgc", "makegroup"],
@@ -220,33 +252,56 @@ try{
         contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fkontak });
     
-    // Create group with sender as participant
-    const { id, subject } = await conn.groupCreate(groupName, [sender]);
-    
-    // Make sender admin
-    await conn.groupParticipantsUpdate(id, [sender], 'promote');
-    
-    await conn.sendMessage(from, {
-        text: `┏━❑ GROUP CREATED ━━━━━━━━━
+    try {
+        // Create group with sender as participant
+        const group = await conn.groupCreate(groupName, [sender]);
+        
+        // Get the group ID
+        const groupId = group.gid || group.id;
+        
+        if (!groupId) {
+            throw new Error('Could not get group ID');
+        }
+        
+        // Make sender admin
+        await conn.groupParticipantsUpdate(groupId, [sender], 'promote');
+        
+        // Get invite link
+        const code = await conn.groupInviteCode(groupId);
+        
+        await conn.sendMessage(from, {
+            text: `┏━❑ GROUP CREATED ━━━━━━━━━
 ┃ ✅ Group created successfully
-┃ 📌 *Name:* ${subject}
-┃ 🔗 *ID:* ${id}
+┃ 📌 *Name:* ${groupName}
+┃ 🔗 *Link:* https://chat.whatsapp.com/${code}
 ┃ 👑 *You are now admin*
 ┗━━━━━━━━━━━━━━━━━━━━`,
-        contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
-    
-    // Send invite link
-    const code = await conn.groupInviteCode(id);
-    await conn.sendMessage(id, {
-        text: `┏━❑ WELCOME TO NEW GROUP ━━━━━━━━━
-┃ 📌 *Group:* ${subject}
-┃ 🔗 *Invite Link:* https://chat.whatsapp.com/${code}
+            contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: fkontak });
+        
+        // Send welcome message in the new group
+        await conn.sendMessage(groupId, {
+            text: `┏━❑ WELCOME TO NEW GROUP ━━━━━━━━━
+┃ 📌 *Group:* ${groupName}
 ┃ 👑 *Admin:* @${sender.split('@')[0]}
+┃ 🤖 Bot is ready to help!
 ┗━━━━━━━━━━━━━━━━━━━━`,
-        mentions: [sender],
-        contextInfo: getContextInfo({ sender: sender })
-    });
+            mentions: [sender],
+            contextInfo: getContextInfo({ sender: sender })
+        });
+        
+    } catch (createError) {
+        console.log('Group creation error:', createError);
+        
+        if (createError.message.includes('bad-request')) {
+            return await conn.sendMessage(from, {
+                text: `❌ Failed to create group. Possible reasons:\n• Invalid group name\n• WhatsApp limit reached\n• Account restricted\n\nTry again with a different name or check your account status.`,
+                contextInfo: getContextInfo({ sender: sender })
+            }, { quoted: fkontak });
+        } else {
+            throw createError;
+        }
+    }
 
 } catch (e) {
     console.log('CREATEGC ERROR:', e);
