@@ -54,8 +54,19 @@ const path = require('path')
 const prefix = config.PREFIX
 
 // ============ OWNER CONFIGURATION ============
-const ownerNumber = ['255662590563', '255637351031'] // Add your owner numbers here
-const ownerJids = ownerNumber.map(num => num.includes('@s.whatsapp.net') ? num : num + '@s.whatsapp.net')
+// Load owner numbers from config.js
+const configOwnerNumbers = config.OWNER_NUMBER ? config.OWNER_NUMBER.split(',') : []
+const ownerNumber = ['255768978061', '255789661031', ...configOwnerNumbers].map(num => num.trim())
+
+// Create JIDs for owners
+const ownerJids = ownerNumber.map(num => {
+  if (num.includes('@s.whatsapp.net')) return num
+  if (num.includes('-')) return num // For group JIDs
+  return num + '@s.whatsapp.net'
+})
+
+console.log('👑 Owner Numbers:', ownerNumber)
+console.log('👑 Owner JIDs:', ownerJids)
 
 // ============ SECURITY FEATURES DATABASE ============
 const securityDB = {
@@ -70,12 +81,12 @@ const securityDB = {
       sticker: true,
       gif: true
     },
-    allowedGroups: [] // Groups where anti-media is disabled
+    allowedGroups: []
   },
   antiTag: {
     enabled: false,
     maxMentions: 5,
-    action: 'warn', // warn, delete, kick
+    action: 'warn',
     warnCount: 3
   },
   antiBug: {
@@ -84,10 +95,10 @@ const securityDB = {
     logBugs: true
   },
   antiSpam: {
-    enabled: false,
+    enabled: true,
     maxMessages: 5,
-    timeWindow: 5000, // 5 seconds
-    action: 'warn', // warn, mute, kick
+    timeWindow: 5000,
+    action: 'warn',
     warnCount: 3,
     userMessages: new Map()
   },
@@ -170,16 +181,15 @@ const express = require("express")
 const app = express()
 const port = process.env.PORT || 9090
 
-let conn // ✅ GLOBAL conn declaration
+let conn
 
 // ============ SECURITY FUNCTIONS ============
 
 // Anti-Media Function
 async function handleAntiMedia(conn, mek, from, sender, isOwner, isAdmins) {
   if (!securityDB.antiMedia.enabled) return false
-  if (isOwner || isAdmins) return false // Skip for owner and admins
+  if (isOwner || isAdmins) return false
   
-  // Check if group is allowed
   if (securityDB.antiMedia.allowedGroups.includes(from)) return false
   
   const type = getContentType(mek.message)
@@ -194,14 +204,11 @@ async function handleAntiMedia(conn, mek, from, sender, isOwner, isAdmins) {
   else if (type.includes('gif')) mediaType = 'gif'
   else return false
   
-  // Check if this media type should be deleted
   if (securityDB.antiMedia.mediaTypes[mediaType]) {
     if (securityDB.antiMedia.deleteSilently) {
-      // Delete silently without notification
       await conn.sendMessage(from, { delete: mek.key })
       console.log(`🔇 Silently deleted ${mediaType} from ${sender}`)
     } else {
-      // Delete with warning
       await conn.sendMessage(from, { delete: mek.key })
       await conn.sendMessage(from, { 
         text: `⚠️ *Anti-Media*\n\n${mediaType} imefutwa kwa sababu media haziruhusiwi kwenye group hili.`,
@@ -227,14 +234,12 @@ async function handleAntiTag(conn, mek, from, sender, isOwner, isAdmins, groupMe
   }
   
   if (mentions.length > securityDB.antiTag.maxMentions) {
-    // Track warns for this user
     const userWarns = antiTagWarns.get(sender) || 0
     const newWarns = userWarns + 1
     antiTagWarns.set(sender, newWarns)
     
     if (securityDB.antiTag.action === 'warn') {
       if (newWarns >= securityDB.antiTag.warnCount) {
-        // Kick after too many warns
         await conn.groupParticipantsUpdate(from, [sender], 'remove')
         antiTagWarns.delete(sender)
         await conn.sendMessage(from, { 
@@ -269,13 +274,12 @@ async function handleAntiBug(conn, mek, from, sender) {
   else if (type === 'extendedTextMessage') text = mek.message.extendedTextMessage.text
   else return false
   
-  // Bug patterns to detect
   const bugPatterns = [
-    /[\u0000-\u001F\u007F-\u009F]/, // Control characters
-    /\u202E/, // Right-to-left override
-    /.{1000,}/, // Very long messages
-    /<[^>]*script/i, // HTML/script tags
-    /[\uD800-\uDFFF]{2,}/ // Invalid Unicode
+    /[\u0000-\u001F\u007F-\u009F]/,
+    /\u202E/,
+    /.{1000,}/,
+    /<[^>]*script/i,
+    /[\uD800-\uDFFF]{2,}/
   ]
   
   for (const pattern of bugPatterns) {
@@ -308,7 +312,6 @@ async function handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins) {
     securityDB.antiSpam.userMessages.set(sender, userData)
     
     if (userData.count > securityDB.antiSpam.maxMessages) {
-      // Track warns
       const userWarns = antiTagWarns.get(sender) || 0
       const newWarns = userWarns + 1
       antiTagWarns.set(sender, newWarns)
@@ -325,18 +328,15 @@ async function handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins) {
           })
         }
       } else if (securityDB.antiSpam.action === 'mute') {
-        // Mute for 5 minutes
         await conn.groupParticipantsUpdate(from, [sender], 'mute')
       } else if (securityDB.antiSpam.action === 'kick') {
         await conn.groupParticipantsUpdate(from, [sender], 'remove')
       }
       
-      // Delete spam messages
       await conn.sendMessage(from, { delete: mek.key })
       return true
     }
   } else {
-    // Reset counter
     securityDB.antiSpam.userMessages.set(sender, { count: 1, firstMsg: now })
   }
   return false
@@ -348,9 +348,7 @@ async function handleAntiBan(conn, update, groupId, participant, action, executo
   
   const botJid = conn.user.id
   const isExecutorOwner = ownerJids.includes(executor)
-  const isExecutorAdmin = false // Will be checked in group context
   
-  // Protect bot from being removed
   if (participant === botJid && action === 'remove') {
     if (!isExecutorOwner) {
       await conn.groupParticipantsUpdate(groupId, [executor], 'remove')
@@ -361,7 +359,6 @@ async function handleAntiBan(conn, update, groupId, participant, action, executo
     }
   }
   
-  // Protect owner
   if (securityDB.antiBan.protectOwner && ownerJids.includes(participant)) {
     if (action === 'remove' || action === 'demote') {
       if (!isExecutorOwner) {
@@ -374,7 +371,6 @@ async function handleAntiBan(conn, update, groupId, participant, action, executo
     }
   }
   
-  // Block group deletion
   if (securityDB.antiBan.blockDeleteGroup && action === 'delete') {
     if (!isExecutorOwner) {
       await conn.sendMessage(groupId, { 
@@ -520,7 +516,6 @@ async function connectToWA() {
   //============================== 
 
   conn.ev.on("group-participants.update", async (update) => {
-    // Handle anti-ban for group updates
     if (securityDB.antiBan.enabled) {
       const { id, participants, action, author } = update
       for (const participant of participants) {
@@ -592,16 +587,30 @@ async function connectToWA() {
     const pushname = mek.pushName || 'Gon'
     const isMe = botNumber.includes(senderNumber)
     
-    // FIXED: Check if sender is owner - using ownerJids array
-    const isOwner = ownerJids.includes(sender) || isMe
+    // ============ FIXED OWNER DETECTION ============
+    // Check if sender is owner (works everywhere - inbox, group, private)
+    const isOwner = ownerJids.includes(sender) || isMe || ownerNumber.includes(senderNumber)
     
+    // Get bot's JID
     const botNumber2 = await jidNormalizedUser(conn.user.id);
+    
+    // Get group metadata if in group
     const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => null) : null
     const groupName = isGroup && groupMetadata ? groupMetadata.subject : ''
     const participants = isGroup && groupMetadata ? groupMetadata.participants : ''
-    const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
+    
+    // ============ FIXED ADMIN DETECTION ============
+    // Get group admins properly
+    let groupAdmins = []
+    if (isGroup && groupMetadata && groupMetadata.participants) {
+      groupAdmins = groupMetadata.participants
+        .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+        .map(p => p.id)
+    }
+    
     const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
     const isAdmins = isGroup ? groupAdmins.includes(sender) : false
+    
     const isReact = m.message.reactionMessage ? true : false
     
     const reply = (teks) => {
@@ -609,7 +618,7 @@ async function connectToWA() {
     }
     
     const udp = botNumber.split('@')[0];
-    const rav = ['255662590563', '255637351031'];
+    const rav = ['255789661031', '255650034217'];
     let isCreator = [udp, ...rav, config.DEV]
       .map(v => v && v.replace ? v.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : null)
       .filter(v => v)
@@ -617,20 +626,14 @@ async function connectToWA() {
 
     // ============ RUN SECURITY CHECKS ============
     if (isGroup) {
-      // Anti-Media
       if (await handleAntiMedia(conn, mek, from, sender, isOwner, isAdmins)) return
-      
-      // Anti-Tag
       if (await handleAntiTag(conn, mek, from, sender, isOwner, isAdmins, groupMetadata)) return
-      
-      // Anti-Spam
       if (await handleAntiSpam(conn, mek, from, sender, isOwner, isAdmins)) return
     }
     
-    // Anti-Bug (runs everywhere)
     if (await handleAntiBug(conn, mek, from, sender)) return
 
-    // ============ OWNER COMMANDS ============
+    // ============ OWNER COMMANDS (WORK EVERYWHERE) ============
     if (isCreator && mek.text.startsWith('%')) {
       let code = budy.slice(2);
       if (!code) {
@@ -668,7 +671,7 @@ async function connectToWA() {
     }
     
     //================ownerreact==============
-    if (senderNumber.includes("255637351031") && !isReact) {
+    if (ownerNumber.includes(senderNumber) && !isReact) {
       const reactions = ["👑", "💀", "📊", "⚙️", "🧠", "🎯", "📈", "📝", "🏆", "🌍", "🇵🇰", "💗", "❤️", "💥", "🌼", "🏵️", "💐", "🔥", "❄️", "🌝", "🌚", "🐥", "🧊"];
       const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
       m.react(randomReaction);
@@ -676,7 +679,6 @@ async function connectToWA() {
 
     //==========public react============//
     
-    // Auto React for all messages (public and owner)
     if (!isReact && config.AUTO_REACT === 'true') {
       const reactions = [
         '🌼', '❤️', '💐', '🔥', '🏵️', '❄️', '🧊', '🐳', '💥', '🥀', '❤‍🔥', '🥹', '😩', '🫣', 
@@ -700,21 +702,19 @@ async function connectToWA() {
       m.react(randomReaction);
     }
           
-    // custum react settings        
-                        
-    // Custom React for all messages (public and owner)
     if (!isReact && config.CUSTOM_REACT === 'true') {
-      // Use custom emojis from the configuration (fallback to default if not set)
       const reactions = (config.CUSTOM_REACT_EMOJIS || '🙂,😔').split(',');
       const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
       m.react(randomReaction);
     }
         
     //==========WORKTYPE============ 
-    // FIXED: Now checks isOwner correctly
-    if(!isOwner && config.MODE === "private") return
-    if(!isOwner && isGroup && config.MODE === "inbox") return
-    if(!isOwner && !isGroup && config.MODE === "groups") return
+    // FIXED: Owner can use commands everywhere regardless of MODE
+    if (!isOwner) {
+      if (config.MODE === "private") return
+      if (isGroup && config.MODE === "inbox") return
+      if (!isGroup && config.MODE === "groups") return
+    }
    
     // take commands 
                  
@@ -726,7 +726,13 @@ async function connectToWA() {
         if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key }})
         
         try {
-          cmd.function(conn, mek, m, {from, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity});
+          cmd.function(conn, mek, m, {
+            from, quoted, body, isCmd, command, args, q, text, 
+            isGroup, sender, senderNumber, botNumber2, botNumber, 
+            pushname, isMe, isOwner, isCreator, groupMetadata, 
+            groupName, participants, groupAdmins, isBotAdmins, isAdmins, 
+            reply, securityDB, saveSecurity
+          });
         } catch (e) {
           console.error("[PLUGIN ERROR] " + e);
         }
@@ -735,19 +741,43 @@ async function connectToWA() {
     
     events.commands.map(async(command) => {
       if (body && command.on === "body") {
-        command.function(conn, mek, m, {from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity})
+        command.function(conn, mek, m, {
+          from, l, quoted, body, isCmd, command, args, q, text, 
+          isGroup, sender, senderNumber, botNumber2, botNumber, 
+          pushname, isMe, isOwner, isCreator, groupMetadata, 
+          groupName, participants, groupAdmins, isBotAdmins, isAdmins, 
+          reply, securityDB, saveSecurity
+        })
       } else if (mek.q && command.on === "text") {
-        command.function(conn, mek, m, {from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity})
+        command.function(conn, mek, m, {
+          from, l, quoted, body, isCmd, command, args, q, text, 
+          isGroup, sender, senderNumber, botNumber2, botNumber, 
+          pushname, isMe, isOwner, isCreator, groupMetadata, 
+          groupName, participants, groupAdmins, isBotAdmins, isAdmins, 
+          reply, securityDB, saveSecurity
+        })
       } else if (
         (command.on === "image" || command.on === "photo") &&
         mek.type === "imageMessage"
       ) {
-        command.function(conn, mek, m, {from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity})
+        command.function(conn, mek, m, {
+          from, l, quoted, body, isCmd, command, args, q, text, 
+          isGroup, sender, senderNumber, botNumber2, botNumber, 
+          pushname, isMe, isOwner, isCreator, groupMetadata, 
+          groupName, participants, groupAdmins, isBotAdmins, isAdmins, 
+          reply, securityDB, saveSecurity
+        })
       } else if (
         command.on === "sticker" &&
         mek.type === "stickerMessage"
       ) {
-        command.function(conn, mek, m, {from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, securityDB, saveSecurity})
+        command.function(conn, mek, m, {
+          from, l, quoted, body, isCmd, command, args, q, text, 
+          isGroup, sender, senderNumber, botNumber2, botNumber, 
+          pushname, isMe, isOwner, isCreator, groupMetadata, 
+          groupName, participants, groupAdmins, isBotAdmins, isAdmins, 
+          reply, securityDB, saveSecurity
+        })
       }
     });
   });
@@ -811,7 +841,6 @@ async function connectToWA() {
       }
       let type = await FileType.fromBuffer(buffer)
       trueFileName = attachExtension ? (filename + '.' + type.ext) : filename
-          // save to file
       await fs.writeFileSync(trueFileName, buffer)
       return trueFileName
     }
@@ -824,18 +853,9 @@ async function connectToWA() {
       for await (const chunk of stream) {
           buffer = Buffer.concat([buffer, chunk])
       }
-    
       return buffer
     }
     
-    /**
-    *
-    * @param {*} jid
-    * @param {*} message
-    * @param {*} forceForward
-    * @param {*} options
-    * @returns
-    */
     //================================================
     conn.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
       let mime = '';
@@ -860,7 +880,6 @@ async function connectToWA() {
     }
     //==========================================================
     conn.cMod = (jid, copy, text = '', sender = conn.user.id, options = {}) => {
-      //let copy = message.toJSON()
       let mtype = Object.keys(copy.message)[0]
       let isEphemeral = mtype === 'ephemeralMessage'
       if (isEphemeral) {
@@ -885,17 +904,10 @@ async function connectToWA() {
       return proto.WebMessageInfo.fromObject(copy)
     }
     
-    
-    /**
-    *
-    * @param {*} path
-    * @returns
-    */
     //=====================================================
     conn.getFile = async(PATH, save) => {
       let res
       let data = Buffer.isBuffer(PATH) ? PATH : /^data:.*?\/.*?;base64,/i.test(PATH) ? Buffer.from(PATH.split `,` [1], 'base64') : /^https?:\/\//.test(PATH) ? await (res = await getBuffer(PATH)) : fs.existsSync(PATH) ? (filename = PATH, fs.readFileSync(PATH)) : typeof PATH === 'string' ? PATH : Buffer.alloc(0)
-          //if (!Buffer.isBuffer(data)) throw new TypeError('Result is not a buffer')
       let type = await FileType.fromBuffer(data) || {
           mime: 'application/octet-stream',
           ext: '.bin'
@@ -909,8 +921,8 @@ async function connectToWA() {
           ...type,
           data
       }
-    
     }
+    
     //=====================================================
     conn.sendFile = async(jid, PATH, fileName, quoted = {}, options = {}) => {
       let types = await conn.getFile(PATH, true)
@@ -973,13 +985,7 @@ async function connectToWA() {
       }, { quoted, ...options })
       return fs.promises.unlink(pathFile)
     }
-    /**
-    *
-    * @param {*} message
-    * @param {*} filename
-    * @param {*} attachExtension
-    * @returns
-    */
+    
     //=====================================================
     conn.sendVideoAsSticker = async (jid, buff, options = {}) => {
       let buffer;
@@ -1008,52 +1014,19 @@ async function connectToWA() {
         options
       );
     };
-        /**
-         *
-         * @param {*} jid
-         * @param {*} path
-         * @param {*} quoted
-         * @param {*} options
-         * @returns
-         */
+    
     //=====================================================
     conn.sendTextWithMentions = async(jid, text, quoted, options = {}) => conn.sendMessage(jid, { text: text, contextInfo: { mentionedJid: [...text.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net') }, ...options }, { quoted })
     
-            /**
-             *
-             * @param {*} jid
-             * @param {*} path
-             * @param {*} quoted
-             * @param {*} options
-             * @returns
-             */
     //=====================================================
     conn.sendImage = async(jid, path, caption = '', quoted = '', options) => {
       let buffer = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split `,` [1], 'base64') : /^https?:\/\//.test(path) ? await (await getBuffer(path)) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
       return await conn.sendMessage(jid, { image: buffer, caption: caption, ...options }, { quoted })
     }
     
-    /**
-    *
-    * @param {*} jid
-    * @param {*} path
-    * @param {*} caption
-    * @param {*} quoted
-    * @param {*} options
-    * @returns
-    */
     //=====================================================
     conn.sendText = (jid, text, quoted = '', options) => conn.sendMessage(jid, { text: text, ...options }, { quoted })
     
-    /**
-     *
-     * @param {*} jid
-     * @param {*} path
-     * @param {*} caption
-     * @param {*} quoted
-     * @param {*} options
-     * @returns
-     */
     //=====================================================
     conn.sendButtonText = (jid, buttons = [], text, footer, quoted = '', options = {}) => {
       let buttonMessage = {
@@ -1063,7 +1036,6 @@ async function connectToWA() {
               headerType: 2,
               ...options
           }
-          //========================================================================================================================================
       conn.sendMessage(jid, buttonMessage, { quoted, ...options })
     }
     //=====================================================
@@ -1082,15 +1054,6 @@ async function connectToWA() {
       conn.relayMessage(jid, template.message, { messageId: template.key.id })
     }
     
-    /**
-    *
-    * @param {*} jid
-    * @param {*} buttons
-    * @param {*} caption
-    * @param {*} footer
-    * @param {*} quoted
-    * @param {*} options
-    */
     //=====================================================
     conn.getName = (jid, withoutContact = false) => {
             id = conn.decodeJid(jid);
