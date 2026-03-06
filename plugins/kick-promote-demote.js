@@ -119,7 +119,7 @@ cmd({
 
 // ==================== PROMOTE COMMAND ====================
 cmd({
-pattern: "promote",
+pattern: "promote2",
 alias: ["p1", "giveadmin", "makeadmin"],
 desc: "Promote a user to admin",
 category: "group",
@@ -301,3 +301,4 @@ await conn.sendMessage(from, {
 }
 
 });
+
