@@ -531,40 +531,70 @@ async function connectToWA() {
   conn.ev.on('messages.upsert', async(mek) => {
     mek = mek.messages[0]
     if (!mek.message) return
-    mek.message = (getContentType(mek.message) === 'ephemeralMessage') 
-    ? mek.message.ephemeralMessage.message 
-    : mek.message;
+    
+    // ============ FIXED: STATUS MESSAGES HANDLING ============
+    // Handle status messages FIRST before any processing
+    if (mek.key && mek.key.remoteJid === 'status@broadcast') {
+      
+      // Auto View Status
+      if (config.AUTO_STATUS_SEEN === "true") {
+        try {
+          await conn.readMessages([mek.key])
+          console.log(`👁️ Auto-viewed status from: ${mek.key.participant || 'unknown'}`)
+        } catch (err) {
+          console.error("❌ Auto-view status error:", err)
+        }
+      }
+      
+      // Auto React Status
+      if (config.AUTO_STATUS_REACT === "true") {
+        try {
+          const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
+          const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+          await conn.sendMessage(mek.key.remoteJid, {
+            react: {
+              text: randomEmoji,
+              key: mek.key,
+            }
+          })
+          console.log(`✅ Auto-reacted to status with: ${randomEmoji}`)
+        } catch (err) {
+          console.error("❌ Auto-react status error:", err)
+        }
+      }
+      
+      // Auto Reply Status
+      if (config.AUTO_STATUS_REPLY === "true") {
+        try {
+          const user = mek.key.participant
+          const text = `${config.AUTO_STATUS_MSG || 'Nice status! 💜'}`
+          await conn.sendMessage(user, { text: text }, { quoted: mek })
+          console.log(`✅ Auto-replied to status from: ${user}`)
+        } catch (err) {
+          console.error("❌ Auto-reply status error:", err)
+        }
+      }
+      
+      // Don't process status messages further
+      return
+    }
+    
+    // ============ NORMAL MESSAGE PROCESSING ============
+    // Handle view once messages
+    if (mek.message?.viewOnceMessageV2) {
+      mek.message = mek.message.viewOnceMessageV2.message
+    }
+    
+    // Handle ephemeral messages
+    if (getContentType(mek.message) === 'ephemeralMessage') {
+      mek.message = mek.message.ephemeralMessage.message
+    }
     
     if (config.READ_MESSAGE === 'true') {
       await conn.readMessages([mek.key]);
       console.log(`Marked message from ${mek.key.remoteJid} as read.`);
     }
-    
-    if(mek.message.viewOnceMessageV2)
-    mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
-    
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
-      await conn.readMessages([mek.key])
-    }
-    
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
-      const ravlike = await conn.decodeJid(conn.user.id);
-      const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
-      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-      await conn.sendMessage(mek.key.remoteJid, {
-        react: {
-          text: randomEmoji,
-          key: mek.key,
-        } 
-      }, { statusJidList: [mek.key.participant, ravlike] });
-    }                       
-    
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
-      const user = mek.key.participant
-      const text = `${config.AUTO_STATUS_MSG}`
-      await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
-    }
-    
+        
     await Promise.all([
       saveMessage(mek),
     ]);
