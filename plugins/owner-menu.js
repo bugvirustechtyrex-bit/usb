@@ -12,19 +12,19 @@ const fkontak = {
         "id": "Halo"
     },
     "message": {
-        "conversation": "TYREX"
+        "conversation": "𝚃𝚈𝚁𝙴𝚇"
     }
 };
 
 // === Context Info yenye newsletter yako na owner number ===
-const getContextInfo = (m, ownerName = "TYREX 𝐌𝐃", formattedOwnerNumber = "255628378557") => {
+const getContextInfo = (m, ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃", formattedOwnerNumber = "255628378557") => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
             newsletterJid: '120363424973782944@newsletter',
-            newsletterName: '© TYREX 𝐌𝐃',
+            newsletterName: '© 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         },
         externalAdReply: {
@@ -50,32 +50,32 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, isOwner, reply, sender }) => {
-    const ownerName = "TYREX 𝐌𝐃";
+    const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
     const ownerNumber = "255628378557";
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
 
     await conn.sendMessage(from, { 
-        text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+        text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* sʜᴜᴛᴛɪɴɢ ᴅᴏᴡɴ...
 *┃◆┊ ᴍᴇssᴀɢᴇ:* ʙᴏᴛ ᴡɪʟʟ ʀᴇsᴛᴀʀᴛ ᴏʀ sᴛᴏᴘ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
         contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
     }, { quoted: fkontak });
 
@@ -93,33 +93,33 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, isOwner, args, reply, sender }) => {
-    const ownerName = "TYREX 𝐌𝐃";
+    const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
     const ownerNumber = "255628378557";
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
 
     if (args.length === 0) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ᴜsᴀɢᴇ:* .broadcast <message>
 *┃◆┊ ᴇxᴀᴍᴘʟᴇ:* .broadcast Hello everyone
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
@@ -135,20 +135,20 @@ async (conn, mek, m, { from, isOwner, args, reply, sender }) => {
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
 
     await conn.sendMessage(from, { 
-        text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+        text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ʙʀᴏᴀᴅᴄᴀsᴛ ᴄᴏᴍᴘʟᴇᴛᴇ
 *┃◆┊ ɢʀᴏᴜᴘs:* ${groups.length} ɢʀᴏᴜᴘ(s)
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
         contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
     }, { quoted: fkontak });
 });
@@ -164,33 +164,33 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, isOwner, quoted, reply, sender }) => {
-    const ownerName = "TYREX 𝐌𝐃";
+    const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
     const ownerNumber = "255628378557";
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
 
     if (!quoted || !quoted.message.imageMessage) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ᴜsᴀɢᴇ:* ʀᴇᴘʟʏ ᴛᴏ ᴀɴ ɪᴍᴀɢᴇ ᴡɪᴛʜ .setme
 *┃◆┊ ɴᴏᴛᴇ:* ᴛʜᴇ ɪᴍᴀɢᴇ ᴡɪʟʟ ʙᴇᴄᴏᴍᴇ ʙᴏᴛ's ᴘᴘ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
@@ -200,26 +200,26 @@ async (conn, mek, m, { from, isOwner, quoted, reply, sender }) => {
         await conn.updateProfilePicture(conn.user.jid, { url: media });
 
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* sᴜᴄᴄᴇss
 *┃◆┊ ᴍᴇssᴀɢᴇ:* ᴘʀᴏғɪʟᴇ ᴘɪᴄᴛᴜʀᴇ ᴜᴘᴅᴀᴛᴇᴅ!
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     } catch (error) {
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴇʀʀᴏʀ
 *┃◆┊ ᴅᴇᴛᴀɪʟs:* ${error.message}
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
@@ -236,19 +236,19 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, isOwner, reply, sender }) => {
-    const ownerName = "TYREX 𝐌𝐃";
+    const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
     const ownerNumber = "255628378557";
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
@@ -260,26 +260,26 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
         }
 
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* sᴜᴄᴄᴇss
 *┃◆┊ ᴍᴇssᴀɢᴇ:* ᴀʟʟ ᴄʜᴀᴛs ᴄʟᴇᴀʀᴇᴅ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     } catch (error) {
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴇʀʀᴏʀ
 *┃◆┊ ᴅᴇᴛᴀɪʟs:* ${error.message}
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
@@ -296,19 +296,19 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, isOwner, reply, sender }) => {
-    const ownerName = "TYREX 𝐌𝐃";
+    const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
     const ownerNumber = "255628378557";
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
@@ -317,14 +317,14 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
     const groupJids = Object.keys(groups).join('\n');
 
     await conn.sendMessage(from, { 
-        text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+        text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ɢʀᴏᴜᴘ ᴊɪᴅs:* (${Object.keys(groups).length} ɢʀᴏᴜᴘs)
 *┃◆┊ ${groupJids.replace(/\n/g, '\n*┃◆┊ ')}*
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
         contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
     }, { quoted: fkontak });
 });
@@ -342,33 +342,33 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, quoted, isOwner, isAdmins, sender, reply }) => {
-    const ownerName = "TYREX 𝐌𝐃";
+    const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
     const ownerNumber = "255628378557";
 
     if (!isOwner && !isAdmins) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ɴᴇᴇᴅ ᴀᴅᴍɪɴ ᴏʀ ᴏᴡɴᴇʀ ʀɪɢʜᴛs
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
 
     if (!m.quoted) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ᴜsᴀɢᴇ:* ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴡɪᴛʜ .ᴅᴇʟᴇᴛᴇ
 *┃◆┊ ɴᴏᴛᴇ:* ᴏɴʟʏ ᴛʜᴇ ᴍᴇssᴀɢᴇ ʏᴏᴜ ʀᴇᴘʟɪᴇᴅ ᴛᴏ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
@@ -384,26 +384,26 @@ async (conn, mek, m, { from, quoted, isOwner, isAdmins, sender, reply }) => {
 
         // Sending a silent success message (optional)
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴍᴇssᴀɢᴇ ᴅᴇʟᴇᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     } catch (e) {
         console.log(e);
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴇʀʀᴏʀ
 *┃◆┊ ᴅᴇᴛᴀɪʟs:* ${e.message || 'ᴄᴏᴜʟᴅ ɴᴏᴛ ᴅᴇʟᴇᴛᴇ ᴍᴇssᴀɢᴇ'}
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
 *╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷*
 
-> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech`,
+> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo({ sender: sender }, ownerName, ownerNumber)
         }, { quoted: fkontak });
     }
