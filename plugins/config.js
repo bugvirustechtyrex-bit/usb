@@ -16,14 +16,14 @@ const fkontak = {
     }
 };
 
-const getContextInfo = (m, ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃", formattedOwnerNumber = "255789661031") => {
+const getContextInfo = (m, ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃", formattedOwnerNumber = "255789661031") => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
             newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterName: '© 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         },
         externalAdReply: {
@@ -52,8 +52,8 @@ cmd({
 }, 
 async (conn, mek, m, { from, quoted, reply, isCreator, sender }) => {
     try {
-        const ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃";
-        const formattedOwnerNumber = "255789661031";
+        const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
+        const formattedOwnerNumber = "2557628378557";
         
         if (!isCreator) {
             return await conn.sendMessage(from, { 
