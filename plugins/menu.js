@@ -39,7 +39,7 @@ const getContextInfo = (sender) => {
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
             newsletterJid: '120363424973782944@newsletter', // Channel yako
-            newsletterName: `✨ TYREX MD ✨`,
+            newsletterName: `✨ 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 ✨`,
             serverMessageId: 143,
         },
     };
@@ -51,7 +51,7 @@ cmd({
   react: '📋',
   category: 'main',
   filename: __filename,
-  desc: 'Show bot main menu with system info (TYREX MD style)'
+  desc: 'Show bot main menu with system info (𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 style)'
 }, async (conn, mek, m, { from, sender, pushName, reply }) => {
   try {
     // Read settings
@@ -85,7 +85,7 @@ cmd({
     }
 
     // ========== TYREX MD HEADER ==========
-    let menu = `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
+    let menu = `*╭┄┄┄🌸🌹 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ᴏᴡɴᴇʀ:* ${ownerName}
 *┃◆┊ ᴛᴇᴄʜ:* TYREX
@@ -112,7 +112,7 @@ cmd({
     }
 
     // ========== FOOTER ==========
-    menu += `\n\n*> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 Tyrex Tech*`;
+    menu += `\n\n*> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡*`;
 
     // ========== SEND WITH IMAGE (NEW URL) ==========
     const menuImage = 'https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg'; // New image link
