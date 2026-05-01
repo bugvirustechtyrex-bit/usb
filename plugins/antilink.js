@@ -1,186 +1,309 @@
 const { cmd } = require("../command");
 const config = require("../config");
+const fs = require('fs');
+const path = require('path');
 
-// FakevCard sawa na zilizopita
-const fkontak = {
-    "key": {
-        "participant": '0@s.whatsapp.net',
-        "remoteJid": '0@s.whatsapp.net',
-        "fromMe": false,
-        "id": "Halo"
-    },
-    "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
+// ==================== DATABASE SETUP ====================
+const dbPath = path.join(__dirname, '../data/antilink_settings.json');
+
+// Kuhakikisha database folder ipo
+const dbFolder = path.join(__dirname, '../data');
+if (!fs.existsSync(dbFolder)) {
+    fs.mkdirSync(dbFolder, { recursive: true });
+}
+
+// Kuhakikisha file ipo
+if (!fs.existsSync(dbPath)) {
+    fs.writeFileSync(dbPath, '{}');
+}
+
+function readDB() {
+    try {
+        return JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+    } catch {
+        return {};
     }
-};
+}
 
+function writeDB(data) {
+    try {
+        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+    } catch (err) {
+        console.error('❌ Error writing to database:', err);
+    }
+}
+
+// ==================== HELPER FUNCTIONS ====================
 const getContextInfo = (m) => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '© TYREX 𝐌𝐃',
             serverMessageId: 143,
         },
     };
 };
 
-// Memory for warnings
-const userWarnings = new Set();
+// ==================== WARNINGS MEMORY ====================
+// Inahifadhiwa kwenye memory (inapotea bot ikirestart)
 const warningCount = {};
 
-// === Anti-Link Event Handler ===
-cmd({ on: "body" }, async (client, message, chat, { from, sender, isGroup, isAdmins, isOwner, body }) => {
-  try {
-    // Basic checks: Only groups, no admins, no owner, must be enabled
-    if (!isGroup || isAdmins || isOwner || !config.ANTI_LINK) return;
+// ==================== ANTI-LINK EVENT HANDLER ====================
+cmd({ 
+    on: "body" 
+}, async (client, message, chat, { from, sender, isGroup, isAdmins, isOwner, body }) => {
+    try {
+        // Basic checks: Makundi tu, sio admin, sio owner
+        if (!isGroup || isAdmins || isOwner) return;
 
-    // Accurate Regex for ALL links (http, https, www, and domains like .com, .net, .ke, etc.)
-    const linkRegex = /((https?:\/\/|www\.)[^\s]+|([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(\/[^\s]*)?)/gi;
+        // Ignore messages from bot itself
+        if (message.key && message.key.fromMe) return;
 
-    if (linkRegex.test(body)) {
-      const mode = config.ANTILINK_MODE || 'delete';
+        // Check database kwa settings za group hii
+        const db = readDB();
+        let antiLinkEnabled;
+        let mode;
 
-      // 1. Delete the message first
-      await client.sendMessage(from, { delete: message.key });
-
-      // 2. Handle Actions (Warn, Kick, or just Delete)
-      if (mode === 'warn') {
-        warningCount[sender] = (warningCount[sender] || 0) + 1;
-        
-        if (warningCount[sender] >= 3) {
-          await client.sendMessage(from, { 
-            text: `🚫 @${sender.split("@")[0]} 𝚛𝚎𝚊𝚌𝚑𝚎𝚍 𝟹/𝟹 𝚠𝚊𝚛𝚗𝚒𝚗𝚐𝚜 𝚊𝚗𝚍 𝚑𝚊𝚜 𝚋𝚎𝚎𝚗 𝚛𝚎𝚖𝚘𝚟𝚎𝚍.\n\n> © Powered by Sila Tech`, 
-            mentions: [sender],
-            contextInfo: getContextInfo({ sender: sender })
-          }, { quoted: fkontak });
-          await client.groupParticipantsUpdate(from, [sender], "remove");
-          delete warningCount[sender];
+        if (db[from] && typeof db[from].enabled !== 'undefined') {
+            // Group ina settings zake
+            antiLinkEnabled = db[from].enabled;
+            mode = db[from].mode || 'delete';
         } else {
-          await client.sendMessage(from, { 
-            text: `⚠️ *𝙻𝚒𝚗𝚔 𝙳𝚎𝚝𝚎𝚌𝚝𝚎𝚍!* @${sender.split("@")[0]}\n\n𝚆𝚊𝚛𝚗𝚒𝚗𝚐: ${warningCount[sender]}/𝟹\n_𝚂𝚎𝚗𝚍𝚒𝚗𝚐 𝚕𝚒𝚗𝚔𝚜 𝚒𝚜 𝚜𝚝𝚛𝚒𝚌𝚝𝚕𝚢 𝚙𝚛𝚘𝚑𝚒𝚋𝚒𝚝𝚎𝚍!_\n\n> © Powered by Sila Tech`, 
-            mentions: [sender],
-            contextInfo: getContextInfo({ sender: sender })
-          }, { quoted: fkontak });
+            // Tumia global config kwa makundi yasiyo na custom settings
+            antiLinkEnabled = config.ANTI_LINK === "true" || config.ANTI_LINK === true;
+            mode = config.LINK_ACTION || 'delete';
         }
-      } 
-      
-      else if (mode === 'kick') {
-        await client.sendMessage(from, { 
-          text: `🚫 *𝙻𝚒𝚗𝚔 𝙳𝚎𝚝𝚎𝚌𝚝𝚎𝚍!* @${sender.split("@")[0]} 𝚑𝚊𝚜 𝚋𝚎𝚎𝚗 𝚔𝚒𝚌𝚔𝚎𝚍.\n\n> © Powered by Sila Tech`, 
-          mentions: [sender],
-          contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
-        await client.groupParticipantsUpdate(from, [sender], "remove");
-      } 
-      
-      else {
-        // Mode: Delete only
-        await client.sendMessage(from, { 
-          text: `🚫 *𝙻𝚒𝚗𝚔𝚜 𝚊𝚛𝚎 𝚗𝚘𝚝 𝚊𝚕𝚕𝚘𝚠𝚎𝚍 𝚑𝚎𝚛𝚎!*\n\n> © Powered by Sila Tech`,
-          contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
-      }
+
+        // Kama antilink imezimwa, acha kabisa
+        if (!antiLinkEnabled) return;
+
+        // Regex ya kutambua links zote
+        const linkRegex = /((https?:\/\/|www\.)[^\s]+|([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(\/[^\s]*)?)/gi;
+
+        // Check kama message ina link
+        if (linkRegex.test(body)) {
+            
+            // 1. FUTA LINK KWANZA (inafuta kabla ya kutoa warning)
+            try {
+                await client.sendMessage(from, { delete: message.key });
+                console.log(`✅ Link deleted from ${sender} in ${from}`);
+            } catch (delErr) {
+                console.error('❌ Failed to delete message:', delErr);
+            }
+
+            // 2. KISHA LETA WARNING/ACTION (baada ya kufuta)
+            if (mode === 'warn') {
+                // Ongeza warning count
+                warningCount[sender] = (warningCount[sender] || 0) + 1;
+                const currentWarnings = warningCount[sender];
+                const maxWarnings = config.LINK_WARN_LIMIT || 3;
+
+                if (currentWarnings >= maxWarnings) {
+                    // Imefikia limit - kick user
+                    await client.sendMessage(from, { 
+                        text: `🚫 @${sender.split("@")[0]} reached ${currentWarnings}/${maxWarnings} warnings and has been removed.\n\n> © Powered by Sila Tech`, 
+                        mentions: [sender],
+                        contextInfo: getContextInfo({ sender: sender })
+                    }, { quoted: message });
+                    
+                    try {
+                        await client.groupParticipantsUpdate(from, [sender], "remove");
+                    } catch (kickErr) {
+                        console.error('❌ Failed to kick user:', kickErr);
+                    }
+                    
+                    // Reset warnings after kick
+                    delete warningCount[sender];
+                } else {
+                    // Toa warning na mention mtumiaji
+                    await client.sendMessage(from, { 
+                        text: `⚠️ *LINK DETECTED!* @${sender.split("@")[0]}\n\n📊 Warning: ${currentWarnings}/${maxWarnings}\n🔒 Sending links is strictly prohibited!\n\n> © Powered by Sila Tech`, 
+                        mentions: [sender],
+                        contextInfo: getContextInfo({ sender: sender })
+                    }, { quoted: message });
+                }
+            } 
+            else if (mode === 'kick') {
+                // Moja kwa moja kick
+                await client.sendMessage(from, { 
+                    text: `🚫 *LINK DETECTED!* @${sender.split("@")[0]} has been kicked for sending links.\n\n> © Powered by Sila Tech`, 
+                    mentions: [sender],
+                    contextInfo: getContextInfo({ sender: sender })
+                }, { quoted: message });
+                
+                try {
+                    await client.groupParticipantsUpdate(from, [sender], "remove");
+                } catch (kickErr) {
+                    console.error('❌ Failed to kick user:', kickErr);
+                }
+            } 
+            else if (mode === 'mute') {
+                // Mute - inabidi uwe na mute system, kwa sasa ina notify tu
+                await client.sendMessage(from, { 
+                    text: `🔇 *LINK DETECTED!* @${sender.split("@")[0]} has been muted for sending links.\n\n> © Powered by Sila Tech`, 
+                    mentions: [sender],
+                    contextInfo: getContextInfo({ sender: sender })
+                }, { quoted: message });
+            }
+            else {
+                // Delete only mode - tayari imefuta, unaweza kutoa notification ndogo
+                await client.sendMessage(from, { 
+                    text: `🗑️ Links are not allowed here! Message deleted.\n\n> © Powered by Sila Tech`,
+                    contextInfo: getContextInfo({ sender: sender })
+                }, { quoted: message });
+            }
+        }
+    } catch (error) {
+        console.error("❌ Anti-link handler error:", error);
     }
-  } catch (error) {
-    console.error("❌ Anti-link handler error:", error);
-  }
 });
 
-// === Anti-Link Command ===
+// ==================== ANTI-LINK COMMAND (PER GROUP) ====================
 cmd({
-  pattern: "antilink",
-  alias: ["alink", "blocklink"],
-  desc: "Toggle and configure link blocking",
-  category: "group",
-  react: "🔗",
-  filename: __filename,
+    pattern: "antilink",
+    alias: ["alink", "blocklink", "linkblock"],
+    desc: "Configure anti-link settings for this group",
+    category: "group",
+    react: "🔗",
+    filename: __filename,
 },
 async (client, message, m, { isGroup, isAdmins, isOwner, from, sender, args, reply }) => {
-  try {
-    if (!isGroup) {
-      return await client.sendMessage(from, { 
-        text: "❌ 𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚒𝚜 𝚘𝚗𝚕𝚢 𝚏𝚘𝚛 𝚐𝚛𝚘𝚞𝚙𝚜!\n\n> © Powered by Sila Tech",
-        contextInfo: getContextInfo({ sender: sender })
-      }, { quoted: fkontak });
-    }
-    
-    if (!isAdmins && !isOwner) {
-      return await client.sendMessage(from, { 
-        text: "🚫 *𝙰𝚍𝚖𝚒𝚗-𝚘𝚗𝚕𝚢 𝚌𝚘𝚖𝚖𝚊𝚗𝚍!*\n\n> © Powered by Sila Tech",
-        mentions: [sender],
-        contextInfo: getContextInfo({ sender: sender })
-      }, { quoted: fkontak });
-    }
-
-    const action = args[0]?.toLowerCase() || 'status';
-    let statusText, reaction = "🔗", additionalInfo = "";
-
-    switch (action) {
-      case 'on':
-        config.ANTI_LINK = true;
-        statusText = "✅ 𝙰𝚗𝚝𝚒-𝚕𝚒𝚗𝚔 𝚑𝚊𝚜 𝚋𝚎𝚎𝚗 *𝙴𝙽𝙰𝙱𝙻𝙴𝙳*!";
-        reaction = "✅";
-        additionalInfo = "𝙰𝚕𝚕 𝚕𝚒𝚗𝚔𝚜 𝚠𝚒𝚕𝚕 𝚗𝚘𝚠 𝚋𝚎 𝚖𝚘𝚗𝚒𝚝𝚘𝚛𝚎𝚍 🛡️";
-        break;
-
-      case 'off':
-        config.ANTI_LINK = false;
-        statusText = "❌ 𝙰𝚗𝚝𝚒-𝚕𝚒𝚗𝚔 𝚑𝚊𝚜 𝚋𝚎𝚎𝚗 *𝙳𝙸𝚂𝙰𝙱𝙻𝙴𝙳*!";
-        reaction = "❌";
-        additionalInfo = "𝙻𝚒𝚗𝚔𝚜 𝚊𝚛𝚎 𝚗𝚘𝚠 𝚊𝚕𝚕𝚘𝚠𝚎𝚍 𝚒𝚗 𝚝𝚑𝚒𝚜 𝚐𝚛𝚘𝚞𝚙 🔓";
-        break;
-
-      case 'warn':
-      case 'kick':
-      case 'delete':
-        config.ANTI_LINK = true;
-        config.ANTILINK_MODE = action;
-        statusText = `⚙️ 𝙼𝚘𝚍𝚎 𝚜𝚎𝚝 𝚝𝚘 *${action.toUpperCase()}*`;
-        reaction = "🛡️";
-        additionalInfo = `𝙱𝚘𝚝 𝚠𝚒𝚕𝚕 𝚗𝚘𝚠 ${action} 𝚞𝚜𝚎𝚛𝚜 𝚜𝚎𝚗𝚍𝚒𝚗𝚐 𝚕𝚒𝚗𝚔𝚜.`;
-        break;
-
-      default:
-        statusText = `📌 𝙰𝚗𝚝𝚒-𝚕𝚒𝚗𝚔 𝚂𝚝𝚊𝚝𝚞𝚜: ${config.ANTI_LINK ? "✅ *𝙴𝙽𝙰𝙱𝙻𝙴𝙳*" : "❌ *𝙳𝙸𝚂𝙰𝙱𝙻𝙴𝙳*"}`;
-        additionalInfo = `𝙲𝚞𝚛𝚛𝚎𝚗𝚝 𝙼𝚘𝚍𝚎: *${config.ANTILINK_MODE || 'delete'}*\n\n*𝚄𝚜𝚊𝚐𝚎:* \n.antilink on/off\n.antilink warn/kick/delete`;
-        break;
-    }
-
-    // Send combined image + newsletter style message
-    await client.sendMessage(from, {
-      image: { url: "https://files.catbox.moe/kiy0hl.jpg" },
-      caption: `
-${statusText}
-${additionalInfo}
-
-> © Powered by Sila Tech
-      `,
-      contextInfo: {
-        mentionedJid: [sender],
-        forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363402325089913@newsletter',
-          newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
-          serverMessageId: 143
+    try {
+        // Check kama ni group
+        if (!isGroup) {
+            return await client.sendMessage(from, { 
+                text: "❌ This command can only be used in groups!\n\n> © Powered by Sila Tech",
+                contextInfo: getContextInfo({ sender: sender })
+            }, { quoted: message });
         }
-      }
-    }, { quoted: fkontak });
 
-    // React to original command
-    await client.sendMessage(from, {
-      react: { text: reaction, key: message.key }
-    });
+        // Check admin au owner
+        if (!isAdmins && !isOwner) {
+            return await client.sendMessage(from, { 
+                text: "🚫 This command is for admins only!\n\n> © Powered by Sila Tech",
+                mentions: [sender],
+                contextInfo: getContextInfo({ sender: sender })
+            }, { quoted: message });
+        }
 
-  } catch (error) {
-    console.error("❌ Anti-link command error:", error);
-    await client.sendMessage(from, { 
-      text: `⚠️ 𝙴𝚛𝚛𝚘𝚛: ${error.message}\n\n> © Powered by Sila Tech`,
-      mentions: [sender],
-      contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
-  }
+        const action = args[0]?.toLowerCase();
+        
+        // Soma database
+        const db = readDB();
+        
+        // Kama group haina settings bado, create default
+        if (!db[from]) {
+            db[from] = {
+                enabled: false,
+                mode: 'delete'
+            };
+        }
+
+        let statusText, reaction = "🔗", additionalInfo = "";
+
+        // Ikiwa hakuna argument, onyesha status
+        if (!action || action === 'status') {
+            const currentSettings = db[from];
+            statusText = `📌 *Anti-link Status*\n\n⚙️ Status: ${currentSettings.enabled ? "✅ *ENABLED*" : "❌ *DISABLED*"}\n🔧 Mode: *${currentSettings.mode || 'delete'}*\n\n📝 *Usage:*\n.antilink on - Enable anti-link\n.antilink off - Disable anti-link\n.antilink warn - Warn users\n.antilink kick - Kick users\n.antilink delete - Delete links only`;
+            additionalInfo = `⚠️ Warning Limit: ${config.LINK_WARN_LIMIT || 3} warnings before kick`;
+            reaction = "📊";
+        } else {
+            switch (action) {
+                case 'on':
+                case 'enable':
+                case 'true':
+                    db[from].enabled = true;
+                    statusText = "✅ Anti-link has been *ENABLED* for this group!";
+                    reaction = "✅";
+                    additionalInfo = `🔧 Mode: ${db[from].mode || 'delete'}\n🛡️ All links will now be monitored`;
+                    break;
+
+                case 'off':
+                case 'disable':
+                case 'false':
+                    db[from].enabled = false;
+                    statusText = "❌ Anti-link has been *DISABLED* for this group!";
+                    reaction = "❌";
+                    additionalInfo = "🔓 Links are now allowed in this group";
+                    break;
+
+                case 'warn':
+                    db[from].enabled = true;
+                    db[from].mode = 'warn';
+                    statusText = "⚠️ Anti-link mode set to *WARN*";
+                    reaction = "⚠️";
+                    additionalInfo = `Users will receive warnings\n📊 Limit: ${config.LINK_WARN_LIMIT || 3} warnings before kick`;
+                    break;
+
+                case 'kick':
+                    db[from].enabled = true;
+                    db[from].mode = 'kick';
+                    statusText = "🚫 Anti-link mode set to *KICK*";
+                    reaction = "🚫";
+                    additionalInfo = "Users will be kicked immediately for sending links";
+                    break;
+
+                case 'delete':
+                case 'del':
+                    db[from].enabled = true;
+                    db[from].mode = 'delete';
+                    statusText = "🗑️ Anti-link mode set to *DELETE ONLY*";
+                    reaction = "🗑️";
+                    additionalInfo = "Links will be deleted without notification";
+                    break;
+
+                case 'mute':
+                    db[from].enabled = true;
+                    db[from].mode = 'mute';
+                    statusText = "🔇 Anti-link mode set to *MUTE*";
+                    reaction = "🔇";
+                    additionalInfo = "Users will be muted for sending links";
+                    break;
+
+                default:
+                    statusText = "❌ Invalid option!";
+                    reaction = "❌";
+                    additionalInfo = "Use: on, off, warn, kick, delete, status";
+            }
+        }
+
+        // Save changes kwenye database
+        writeDB(db);
+
+        // Send response (using quoted message instead of fkontak)
+        await client.sendMessage(from, {
+            image: { url: "https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg" },
+            caption: `${statusText}\n${additionalInfo}\n\n> © Powered by Tyrex Tech`,
+            contextInfo: {
+                mentionedJid: [sender],
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '120363424973782944@newsletter',
+                    newsletterName: '© TYREX 𝐌𝐃',
+                    serverMessageId: 143
+                }
+            }
+        }, { quoted: message });  // 👈 Hapa inareply moja kwa moja kwa message ya mtumiaji
+
+        // React to command
+        try {
+            await client.sendMessage(from, {
+                react: { text: reaction, key: message.key }
+            });
+        } catch (reactErr) {
+            console.error('❌ React error:', reactErr);
+        }
+
+    } catch (error) {
+        console.error("❌ Anti-link command error:", error);
+        await client.sendMessage(from, { 
+            text: `⚠️ Error: ${error.message}\n\n> © Powered by Tyrex Tech`,
+            mentions: [sender],
+            contextInfo: getContextInfo({ sender: sender })
+        }, { quoted: message });
+    }
 });
