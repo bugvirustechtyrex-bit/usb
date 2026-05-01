@@ -16,9 +16,9 @@ async (conn, mek, m, { from, sender, reply }) => {
     try {
         const botName = await getBotName(); // Sasa inachukua jina lako halisi
         
-        const info = `┏━❑ 𝐀𝐁𝐎𝐔𝐓 ${botName} ━━━━━━━━━
+        const info = `┏━❑ 𝐀𝐁𝐎𝐔𝐓 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 ━━━━━━━━━
 ┃
-┃ 🤖 *Jina:* ${botName}
+┃ 🤖 *Jina:* 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃
 ┃ ⚡ *Toleo:* 2.0.0
 ┃ 📦 *Mfumo:* WhatsApp (Baileys)
 ┃ 👑 *Mmiliki:* 𝐓𝐘𝐑𝐄𝐗 𝐓𝐄𝐂𝐇
