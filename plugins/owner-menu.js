@@ -55,7 +55,7 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
@@ -68,7 +68,7 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
     }
 
     await conn.sendMessage(from, { 
-        text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+        text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* sʜᴜᴛᴛɪɴɢ ᴅᴏᴡɴ...
 *┃◆┊ ᴍᴇssᴀɢᴇ:* ʙᴏᴛ ᴡɪʟʟ ʀᴇsᴛᴀʀᴛ ᴏʀ sᴛᴏᴘ
@@ -98,7 +98,7 @@ async (conn, mek, m, { from, isOwner, args, reply, sender }) => {
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
@@ -112,7 +112,7 @@ async (conn, mek, m, { from, isOwner, args, reply, sender }) => {
 
     if (args.length === 0) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ᴜsᴀɢᴇ:* .broadcast <message>
 *┃◆┊ ᴇxᴀᴍᴘʟᴇ:* .broadcast Hello everyone
@@ -129,7 +129,7 @@ async (conn, mek, m, { from, isOwner, args, reply, sender }) => {
 
     for (const groupId of groups) {
         await conn.sendMessage(groupId, { 
-            text: `*╭┄┄┄🌸🌹 BROADCAST 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 BROADCAST 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ᴍᴇssᴀɢᴇ:* ${message}
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
@@ -141,7 +141,7 @@ async (conn, mek, m, { from, isOwner, args, reply, sender }) => {
     }
 
     await conn.sendMessage(from, { 
-        text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+        text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ʙʀᴏᴀᴅᴄᴀsᴛ ᴄᴏᴍᴘʟᴇᴛᴇ
 *┃◆┊ ɢʀᴏᴜᴘs:* ${groups.length} ɢʀᴏᴜᴘ(s)
@@ -169,7 +169,7 @@ async (conn, mek, m, { from, isOwner, quoted, reply, sender }) => {
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
@@ -183,7 +183,7 @@ async (conn, mek, m, { from, isOwner, quoted, reply, sender }) => {
 
     if (!quoted || !quoted.message.imageMessage) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ᴜsᴀɢᴇ:* ʀᴇᴘʟʏ ᴛᴏ ᴀɴ ɪᴍᴀɢᴇ ᴡɪᴛʜ .setme
 *┃◆┊ ɴᴏᴛᴇ:* ᴛʜᴇ ɪᴍᴀɢᴇ ᴡɪʟʟ ʙᴇᴄᴏᴍᴇ ʙᴏᴛ's ᴘᴘ
@@ -200,7 +200,7 @@ async (conn, mek, m, { from, isOwner, quoted, reply, sender }) => {
         await conn.updateProfilePicture(conn.user.jid, { url: media });
 
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* sᴜᴄᴄᴇss
 *┃◆┊ ᴍᴇssᴀɢᴇ:* ᴘʀᴏғɪʟᴇ ᴘɪᴄᴛᴜʀᴇ ᴜᴘᴅᴀᴛᴇᴅ!
@@ -212,7 +212,7 @@ async (conn, mek, m, { from, isOwner, quoted, reply, sender }) => {
         }, { quoted: fkontak });
     } catch (error) {
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴇʀʀᴏʀ
 *┃◆┊ ᴅᴇᴛᴀɪʟs:* ${error.message}
@@ -241,7 +241,7 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
@@ -260,7 +260,7 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
         }
 
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* sᴜᴄᴄᴇss
 *┃◆┊ ᴍᴇssᴀɢᴇ:* ᴀʟʟ ᴄʜᴀᴛs ᴄʟᴇᴀʀᴇᴅ
@@ -272,7 +272,7 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
         }, { quoted: fkontak });
     } catch (error) {
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴇʀʀᴏʀ
 *┃◆┊ ᴅᴇᴛᴀɪʟs:* ${error.message}
@@ -301,7 +301,7 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
 
     if (!isOwner) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴛʜᴇ ᴏᴡɴᴇʀ
@@ -317,7 +317,7 @@ async (conn, mek, m, { from, isOwner, reply, sender }) => {
     const groupJids = Object.keys(groups).join('\n');
 
     await conn.sendMessage(from, { 
-        text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+        text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ɢʀᴏᴜᴘ ᴊɪᴅs:* (${Object.keys(groups).length} ɢʀᴏᴜᴘs)
 *┃◆┊ ${groupJids.replace(/\n/g, '\n*┃◆┊ ')}*
@@ -347,7 +347,7 @@ async (conn, mek, m, { from, quoted, isOwner, isAdmins, sender, reply }) => {
 
     if (!isOwner && !isAdmins) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴀᴄᴄᴇss ᴅᴇɴɪᴇᴅ
 *┃◆┊ ʀᴇᴀsᴏɴ:* ʏᴏᴜ ɴᴇᴇᴅ ᴀᴅᴍɪɴ ᴏʀ ᴏᴡɴᴇʀ ʀɪɢʜᴛs
@@ -361,7 +361,7 @@ async (conn, mek, m, { from, quoted, isOwner, isAdmins, sender, reply }) => {
 
     if (!m.quoted) {
         return await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ ᴜsᴀɢᴇ:* ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴡɪᴛʜ .ᴅᴇʟᴇᴛᴇ
 *┃◆┊ ɴᴏᴛᴇ:* ᴏɴʟʏ ᴛʜᴇ ᴍᴇssᴀɢᴇ ʏᴏᴜ ʀᴇᴘʟɪᴇᴅ ᴛᴏ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ
@@ -384,7 +384,7 @@ async (conn, mek, m, { from, quoted, isOwner, isAdmins, sender, reply }) => {
 
         // Sending a silent success message (optional)
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴍᴇssᴀɢᴇ ᴅᴇʟᴇᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ
 *┃◆┴┄★ ★ ★ ★ ★ ★ ★ ★*
@@ -396,7 +396,7 @@ async (conn, mek, m, { from, quoted, isOwner, isAdmins, sender, reply }) => {
     } catch (e) {
         console.log(e);
         await conn.sendMessage(from, { 
-            text: `*╭┄┄┄🌸🌹 TYREX MD 🌸🌹┄┄┄⊷*
+            text: `*╭┄┄┄🌸🌹 TYREX MD 🌹🌸┄┄┄⊷*
 *┃◆┬┄★ ★ ★ ★ ★ ★ ★ ★*
 *┃◆┊ sᴛᴀᴛᴜs:* ᴇʀʀᴏʀ
 *┃◆┊ ᴅᴇᴛᴀɪʟs:* ${e.message || 'ᴄᴏᴜʟᴅ ɴᴏᴛ ᴅᴇʟᴇᴛᴇ ᴍᴇssᴀɢᴇ'}
