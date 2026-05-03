@@ -3,8 +3,8 @@ const config = require("../config");
 const fs = require('fs');
 const path = require('path');
 
-// ==================== DATABASE ====================
-const dbPath = path.join(__dirname, '../data/antigroupmention_settings.json');
+// ==================== DATABASE SETUP ====================
+const dbPath = path.join(__dirname, '../data/antigrpmention_settings.json');
 const dbFolder = path.join(__dirname, '../data');
 if (!fs.existsSync(dbFolder)) fs.mkdirSync(dbFolder, { recursive: true });
 if (!fs.existsSync(dbPath)) fs.writeFileSync(dbPath, '{}');
@@ -16,16 +16,15 @@ function readDB() {
         return {};
     }
 }
-
 function writeDB(data) {
     try {
         fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
     } catch (err) {
-        console.error('❌ Error writing anti-groupmention DB:', err);
+        console.error('❌ AntiGrpMention DB error:', err);
     }
 }
 
-// ==================== HELPER ====================
+// ==================== CONTEXT INFO (NEWSLETTER STYLE) ====================
 const getContextInfo = (sender) => {
     return {
         mentionedJid: [sender],
@@ -39,9 +38,10 @@ const getContextInfo = (sender) => {
     };
 };
 
-// ==================== EVENT HANDLER (detects @everyone / @all) ====================
+// ==================== EVENT HANDLER (detects @everyone/@all) ====================
 cmd({ on: "body" }, async (client, message, chat, { from, sender, isGroup, isAdmins, isOwner, body }) => {
     try {
+        // Hakikisha ni group, si admin, si owner, si ujumbe wa bot yenyewe
         if (!isGroup || isAdmins || isOwner) return;
         if (message.key && message.key.fromMe) return;
 
@@ -53,8 +53,7 @@ cmd({ on: "body" }, async (client, message, chat, { from, sender, isGroup, isAdm
             enabled = db[from].enabled;
             mode = db[from].mode || 'delete';
         } else {
-            // optional global default (you can set from config if needed)
-            enabled = false;
+            enabled = false; // default imezimwa
             mode = 'delete';
         }
 
@@ -64,44 +63,45 @@ cmd({ on: "body" }, async (client, message, chat, { from, sender, isGroup, isAdm
         const mentionRegex = /(@everyone|@all)/i;
         if (!mentionRegex.test(body)) return;
 
-        // 1. Delete the offending message
+        // 1. Futa ujumbe wenye mention
         try {
             await client.sendMessage(from, { delete: message.key });
-        } catch (e) {
-            console.error('Failed to delete groupmention message:', e);
+            console.log(`🗑️ Deleted group mention from ${sender} in ${from}`);
+        } catch (delErr) {
+            console.error('❌ Failed to delete mention message:', delErr);
         }
 
-        // 2. Take action
+        // 2. Chukua hatua kulingana na mode
         if (mode === 'warn') {
             await client.sendMessage(from, {
-                text: `⚠️ *Group mention detected!*\n@${sender.split('@')[0]}, please do not tag everyone/all.\n\n> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
+                text: `⚠️ *Group mention detected!*\n@${sender.split("@")[0]} tafadhari usitumie @everyone au @all.\n\n> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
                 mentions: [sender],
                 contextInfo: getContextInfo(sender)
             }, { quoted: message });
-        } 
+        }
         else if (mode === 'kick') {
             await client.sendMessage(from, {
-                text: `🚫 *Group mention detected!*\n@${sender.split('@')[0]} has been kicked.\n\n> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
+                text: `🚫 *Group mention detected!*\n@${sender.split("@")[0]} ametolewa kwenye kundi.\n\n> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
                 mentions: [sender],
                 contextInfo: getContextInfo(sender)
             }, { quoted: message });
             try {
                 await client.groupParticipantsUpdate(from, [sender], "remove");
-            } catch (err) {
-                console.error('Kick failed:', err);
+            } catch (kickErr) {
+                console.error('❌ Kick failed:', kickErr);
             }
         }
-        // if mode === 'delete' -> no extra message, just deleted
+        // mode 'delete' -> hakuna ujumbe zaidi, umefutwa tu
     } catch (err) {
-        console.error('Anti-GroupMention handler error:', err);
+        console.error('❌ AntiGrpMention handler error:', err);
     }
 });
 
-// ==================== COMMAND TO CONFIGURE ====================
+// ==================== COMMAND YA KUSAJI MIPANGILIO ====================
 cmd({
     pattern: "antigrpmention",
-    alias: ["antigpmention", "agm", "antieveryone"],
-    desc: "Configure anti-group-mention settings",
+    alias: ["agm", "antieveryone", "antiall"],
+    desc: "Kuzuia au kuchukua hatua kwa @everyone / @all kwenye makundi",
     category: "group",
     react: "🔇",
     filename: __filename,
@@ -110,14 +110,14 @@ async (client, message, m, { isGroup, isAdmins, isOwner, from, sender, args, rep
     try {
         if (!isGroup) {
             return await client.sendMessage(from, {
-                text: "❌ This command can only be used in groups!\n\n> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡",
+                text: "❌ Command hii inatumika kwenye makundi tu!",
                 contextInfo: getContextInfo(sender)
             }, { quoted: message });
         }
 
         if (!isAdmins && !isOwner) {
             return await client.sendMessage(from, {
-                text: "🚫 Only group admins can use this command!",
+                text: "🚫 Wana admin pekee ndio wanaweza kutumia command hii!",
                 mentions: [sender],
                 contextInfo: getContextInfo(sender)
             }, { quoted: message });
@@ -127,63 +127,64 @@ async (client, message, m, { isGroup, isAdmins, isOwner, from, sender, args, rep
         const db = readDB();
         if (!db[from]) db[from] = { enabled: false, mode: 'delete' };
 
-        let statusText, reaction = "🔇", extra = "";
+        let statusText = "", reaction = "🔇", extra = "";
 
         if (!action || action === 'status') {
             const settings = db[from];
-            statusText = `📌 *Anti Group Mention Settings*\n\n⚙️ Status: ${settings.enabled ? "✅ ENABLED" : "❌ DISABLED"}\n🔧 Mode: *${settings.mode}*\n\n📝 *Commands:*\n.antigroupmention on\n.antigroupmention off\n.antigroupmention set delete  (just delete)\n.antigroupmention set warn    (delete + warn)\n.antigrpmention set kick    (delete + kick)`;
-            extra = `Detects: @everyone , @all`;
+            statusText = `📌 *Hali ya Anti Group Mention*\n\n⚙️ Imewashwa: ${settings.enabled ? "✅ NDIO" : "❌ HAPANA"}\n🔧 Njia: *${settings.mode}*\n\n📝 *Amri:*\n.agm on      - Washa ulinzi\n.agm off     - Zima ulinzi\n.agm set delete  - Futa tu\n.agm set warn    - Futa + onyo\n.agm set kick    - Futa + toa nje`;
+            extra = `Inagundua: @everyone , @all`;
             reaction = "📊";
         } 
         else if (action === 'on') {
             db[from].enabled = true;
-            statusText = "✅ Anti group mention has been *ENABLED* for this group!";
+            statusText = "✅ Ulinzi wa @everyone/@all umewashwa kwa kundi hili!";
             reaction = "✅";
-            extra = "Anyone tagging @everyone/@all will be stopped.";
+            extra = "Sasa kila mtu anayetaja @everyone au @all atachukuliwa hatua.";
         }
         else if (action === 'off') {
             db[from].enabled = false;
-            statusText = "❌ Anti group mention has been *DISABLED* for this group!";
+            statusText = "❌ Ulinzi wa @everyone/@all umezimwa kwa kundi hili.";
             reaction = "❌";
-            extra = "Now @everyone/@all mentions are allowed.";
+            extra = "Sasa watu wanaweza kutumia @everyone / @all bila kizuizi.";
         }
         else if (action === 'set') {
             const mode = args[1]?.toLowerCase();
             if (!['delete', 'warn', 'kick'].includes(mode)) {
                 return await client.sendMessage(from, {
-                    text: "❌ Invalid mode! Use: delete, warn, or kick",
+                    text: "❌ Njia isiyo sahihi. Tumia: delete, warn, au kick",
                     contextInfo: getContextInfo(sender)
                 }, { quoted: message });
             }
             db[from].enabled = true;
             db[from].mode = mode;
-            statusText = `🔄 Anti group mention mode set to *${mode.toUpperCase()}*`;
+            statusText = `🔄 Njia ya ulinzi imebadilishwa kuwa *${mode.toUpperCase()}*`;
             reaction = "⚙️";
-            extra = mode === 'delete' ? "Messages will be deleted silently." : (mode === 'warn' ? "Users will be warned then message deleted." : "Users will be kicked immediately.");
+            extra = mode === 'delete' ? "Ujumbe utafutwa tu." : (mode === 'warn' ? "Ujumbe utafutwa na mtumiaji ataonywa." : "Ujumbe utafutwa na mtumiaji atatolewa nje.");
         }
         else {
-            statusText = "❌ Unknown option. Use: on, off, set <delete/warn/kick>, status";
+            statusText = "❌ Amri isiyojulikana. Tumia: on, off, set <delete/warn/kick>, status";
             reaction = "❌";
         }
 
+        // Hifadhi mabadiliko
         writeDB(db);
 
-        // Send response with image
+        // Tuma jibu pamoja na picha ya brand
         await client.sendMessage(from, {
             image: { url: "https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg" },
             caption: `${statusText}\n${extra}\n\n> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
             contextInfo: getContextInfo(sender)
         }, { quoted: message });
 
-        // React to command
+        // React kwa command
         try {
             await client.sendMessage(from, { react: { text: reaction, key: message.key } });
         } catch (e) {}
 
     } catch (err) {
-        console.error("AntiGroupMention command error:", err);
+        console.error("❌ AntiGrpMention command error:", err);
         await client.sendMessage(from, {
-            text: `⚠️ Error: ${err.message}`,
+            text: `⚠️ Hitilafu: ${err.message}`,
             contextInfo: getContextInfo(sender)
         }, { quoted: message });
     }
