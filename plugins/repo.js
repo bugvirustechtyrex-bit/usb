@@ -1,32 +1,16 @@
-const { cmd } = require('../command');
+ const { cmd } = require('../command');
 const axios = require('axios');
 
-const REPO_IMAGE = 'https://files.catbox.moe/36vahk.png';
-const REPO_LINK = 'https://github.com/Sila-Md/SILA-MD';
+const REPO_IMAGE = 'https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg';
+const REPO_LINK = 'https://github.com/bugvirustechtyrex-bit/Tyrex-MD';
 
-// Define combined fakevCard 
-const fakevCard = {
-  key: {
-    fromMe: false,
-    participant: "0@s.whatsapp.net",
-    remoteJid: "status@broadcast"
-  },
-  message: {
-    contactMessage: {
-      displayName: "© 𝐒𝐈𝐋𝐀-𝐌𝐃",
-      vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:𝐒𝐈𝐋𝐀 𝐌𝐃 𝐁𝐎𝐓\nORG:𝐒𝐈𝐋𝐀-𝐌𝐃;\nTEL;type=CELL;type=VOICE;waid=255789661031:+255789661031\nEND:VCARD`
-    }
-  }
-};
-
-// Utility function for formatted messages
-function silaMessage(text) {
+function tyrexMessage(text) {
   return {
     text: text,
     contextInfo: {
       externalAdReply: {
-        title: 'SILA-MD',
-        body: 'GitHub Repository ‧ Verified',
+        title: 'TYREX MD',
+        body: 'GitHub Repository • Verified',
         thumbnailUrl: REPO_IMAGE,
         sourceUrl: REPO_LINK,
         mediaUrl: REPO_IMAGE,
@@ -34,8 +18,8 @@ function silaMessage(text) {
         mediaType: 1
       },
       forwardedNewsletterMessageInfo: {
-        newsletterJid: '120363402325089913@newsletter',
-        newsletterName: 'SILA TECH',
+        newsletterJid: '120363424973782944@newsletter',
+        newsletterName: 'TYREX TECH',
         serverMessageId: Math.floor(Math.random() * 1000000)
       },
       isForwarded: true,
@@ -54,12 +38,11 @@ cmd({
 },
 async (conn, mek, m, { from, sender, reply }) => {
     try {
-        // Fetch GitHub stats
         let stars = '⭐';
         let forks = '🔀';
         
         try {
-            const response = await axios.get('https://api.github.com/repos/Sila-Md/SILA-MD');
+            const response = await axios.get('https://api.github.com/repos/bugvirustechtyrex-bit/Tyrex-MD');
             stars = response.data.stargazers_count || '⭐';
             forks = response.data.forks_count || '🔀';
         } catch (err) {
@@ -67,23 +50,24 @@ async (conn, mek, m, { from, sender, reply }) => {
         }
         
         const repoMessage = 
-`┏━❑ 𝐒𝐈𝐋𝐀-𝐌𝐃 𝙶𝙸𝚃𝙷𝚄𝙱 ━━━━━━━━━
-┃ 📦 𝚁𝚎𝚙𝚘𝚜𝚒𝚝𝚘𝚛𝚢: SILA-MD
-┃ 👨‍💻 𝙳𝚎𝚟𝚎𝚕𝚘𝚙𝚎𝚛: Sila Tech
-┃ 🔗 𝙻𝚒𝚗𝚔: https://github.com/Sila-Md/SILA-MD
+`╭┄┄┄🌸🌹 *TYREX MD GITHUB* 🌹🌸┄┄┄⊷
+┃ 📦 Repository: TYREX-MD
+┃ 👨‍💻 Developer: Tyrex Tech
+┃ 🔗 Link: https://github.com/bugvirustechtyrex-bit/Tyrex-MD
 ┃
-┃ ⭐ 𝚂𝚝𝚊𝚛𝚜: ${stars}
-┃ 🔀 𝙵𝚘𝚛𝚔𝚜: ${forks}
+┃ ⭐ Stars: ${stars}
+┃ 🔀 Forks: ${forks}
 ┃
-┃ 🛠️ 𝙾𝚙𝚎𝚗 𝚂𝚘𝚞𝚛𝚌𝚎 𝚆𝚑𝚊𝚝𝚜𝙰𝚙𝚙 𝙱𝚘𝚝
-┃ 💚 𝙼𝚊𝚍𝚎 𝚠𝚒𝚝𝚑 ❤️ 𝚋𝚢 𝚂𝚒𝚕𝚊 𝚃𝚎𝚌𝚑
-┗━━━━━━━━━━━━━━━━━━━━`;
+┃ 🛠️ Open Source WhatsApp Bot
+┃ 💚 Made with ❤️ by Tyrex Tech
+╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷
+> ® Powered by Tyrex Tech`;
 
-        const messageData = silaMessage(repoMessage);
+        const messageData = tyrexMessage(repoMessage);
         
-        await conn.sendMessage(from, messageData, { quoted: fakevCard });
+        await conn.sendMessage(from, messageData, { quoted: mek });
         
     } catch (e) {
-        reply("❌ 𝙴𝚛𝚛𝚘𝚛: " + e.message);
+        reply("❌ Error: " + e.message);
     }
 });
