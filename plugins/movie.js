@@ -1,26 +1,13 @@
 const { cmd } = require('../command');
 
-// FakevCard
-const fkontak = {
-    "key": {
-        "participant": '0@s.whatsapp.net',
-        "remoteJid": '0@s.whatsapp.net',
-        "fromMe": false,
-        "id": "Halo"
-    },
-    "message": {
-        "conversation": "𝐒𝐈𝐋𝐀 𝐌𝐃"
-    }
-};
-
 const getContextInfo = (m) => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         },
     };
@@ -37,7 +24,7 @@ cmd({
 },
 async(conn, mek, m, {from, sender, pushname, reply}) => {
 try{
-    const movieInfo = `┏━❑ *SWAHILIFLIX MOVIES* ━━━━━━━━━
+    const movieInfo = `╭┄┄┄🌸🌹 *SWAHILIFLIX MOVIES* 🌹🌸┄┄┄⊷
 ┃ 
 ┃ 👋 *Habari ${pushname || 'Mjumbe'}!*
 ┃ 
@@ -123,15 +110,15 @@ try{
 ┃ ════ *📲 Swahiliflix* ════
 ┃ *Movie bora kwa Kiswahili*
 ┃ *Kwa urahisi na uaminifu*
-┗━━━━━━━━━━━━━━━━━━━━
+╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷
 
-> © 𝐒𝐈𝐋𝐀 𝐌𝐃`;
+> ® 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃`;
 
     await conn.sendMessage(from, {
-        image: { url: 'https://files.catbox.moe/nryse9.jpg' }, // Replace with actual image URL
+        image: { url: 'https://files.catbox.moe/nryse9.jpg' },
         caption: movieInfo,
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 
 } catch (e) {
     console.log(e);
@@ -150,7 +137,7 @@ cmd({
 },
 async(conn, mek, m, {from, sender, reply}) => {
 try{
-    const shortInfo = `┏━❑ *SWAHILIFLIX* ━━━━━━━━━
+    const shortInfo = `╭┄┄┄🌸🌹 *SWAHILIFLIX* 🌹🌸┄┄┄⊷
 ┃ 
 ┃ 🎬 *Movie Service Tanzania*
 ┃ 
@@ -173,14 +160,14 @@ try{
 ┃ 📹 *Maelekezo:*
 ┃ https://drive.google.com/file/d/1faQ6MgvyezWJSO_XPANmLMtHsu0yorI5/view
 ┃ 
-┗━━━━━━━━━━━━━━━━━━━━
+╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷
 
 > *Movie bora kwa Kiswahili*`;
 
     await conn.sendMessage(from, {
         text: shortInfo,
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 
 } catch (e) {
     console.log(e);
@@ -198,7 +185,7 @@ cmd({
 },
 async(conn, mek, m, {from, sender, reply}) => {
 try{
-    const priceInfo = `┏━❑ *BEI ZA KUJIUNGA* ━━━━━━━━━
+    const priceInfo = `╭┄┄┄🌸🌹 *BEI ZA KUJIUNGA* 🌹🌸┄┄┄⊷
 ┃ 
 ┃ 💰 *Mwezi 1* ━ *4,000 TZS*
 ┃ 💰 *Miezi 2* ━ *8,000 TZS*
@@ -210,14 +197,14 @@ try{
 ┃ 👇 *JIUNGE SASA:*
 ┃ https://wa.me/256756076875?text=%F0%9F%92%B3NIPE%20NAMBA%20NILIPIE%20HUDUMA%20YA%20MOVIE
 ┃ 
-┗━━━━━━━━━━━━━━━━━━━━
+╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷
 
 > *Swahiliflix - Movie bora kwa Kiswahili*`;
 
     await conn.sendMessage(from, {
         text: priceInfo,
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 
 } catch (e) {
     console.log(e);
@@ -235,7 +222,7 @@ cmd({
 },
 async(conn, mek, m, {from, sender, reply}) => {
 try{
-    const joinInfo = `┏━❑ *JIUNGE NA SWAHILIFLIX* ━━━━━━━━━
+    const joinInfo = `╭┄┄┄🌸🌹 *JIUNGE NA SWAHILIFLIX* 🌹🌸┄┄┄⊷
 ┃ 
 ┃ 👇 *Bonyeza link hapa chini:*
 ┃ 🔗 https://wa.me/256756076875?text=%F0%9F%92%B3NIPE%20NAMBA%20NILIPIE%20HUDUMA%20YA%20MOVIE
@@ -244,14 +231,14 @@ try{
 ┃ 
 ┃ 📋 *Unapata:* Movie zote + Season kamili
 ┃ 
-┗━━━━━━━━━━━━━━━━━━━━
+╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷
 
 > *Kwa Kiswahili, kwa urahisi*`;
 
     await conn.sendMessage(from, {
         text: joinInfo,
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 
 } catch (e) {
     console.log(e);
@@ -269,7 +256,7 @@ cmd({
 },
 async(conn, mek, m, {from, sender, reply}) => {
 try{
-    const guideInfo = `┏━❑ *MAELEKEZO YA APP* ━━━━━━━━━
+    const guideInfo = `╭┄┄┄🌸🌹 *MAELEKEZO YA APP* 🌹🌸┄┄┄⊷
 ┃ 
 ┃ 👇 *Bonyeza hapa kuona video ya maelekezo:*
 ┃ 📹 https://drive.google.com/file/d/1faQ6MgvyezWJSO_XPANmLMtHsu0yorI5/view
@@ -279,14 +266,14 @@ try{
 ┃ 🔹 Ep 9+ na Single movies ni *Members only*
 ┃ 🔹 Tumia *data* au *download* kwa offline
 ┃ 
-┗━━━━━━━━━━━━━━━━━━━━
+╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷
 
 > *Swahiliflix - Rahisi na bora*`;
 
     await conn.sendMessage(from, {
         text: guideInfo,
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 
 } catch (e) {
     console.log(e);
