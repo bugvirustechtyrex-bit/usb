@@ -1,7 +1,7 @@
 const { cmd } = require("../command");
 const axios = require("axios");
 
-// FakevCard sawa na zilizopita
+// FakevCard ya TYREX MD
 const fkontak = {
     "key": {
         "participant": '0@s.whatsapp.net',
@@ -10,7 +10,7 @@ const fkontak = {
         "id": "Halo"
     },
     "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
+        "conversation": "𝐓𝐘𝐑𝐄𝐗"
     }
 };
 
@@ -20,8 +20,8 @@ const getContextInfo = (m) => {
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         }
     };
@@ -32,7 +32,7 @@ const processedMessages = new Set();
 cmd(
   {
     pattern: "apk",
-    alias: ["app", "downloadapk", "androidapp", "gtechapk"],
+    alias: ["app", "downloadapk", "androidapp", "tyrexapk"],
     desc: "Search and download APK files",
     category: "download",
     react: "📱",
@@ -46,7 +46,7 @@ cmd(
 
       if (!q) {
         return await conn.sendMessage(from, { 
-          text: "👉 *𝙿𝚕𝚎𝚊𝚜𝚎 𝚙𝚛𝚘𝚟𝚒𝚍𝚎 𝚊𝚗 𝚊𝚙𝚙 𝚗𝚊𝚖𝚎 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑*\n\n*Example:* .apk whatsapp\n*Example:* .apk instagram\n*Example:* .apk capcut\n\n> © Powered by Sila Tech", 
+          text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ 📱 *APK DOWNLOADER*\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ 👉 *Please provide an app name*\n┃\n┃ 📝 *Example:*\n┃ *.apk whatsapp*\n┃ *.apk instagram*\n┃ *.apk capcut*\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
           contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
       }
@@ -61,7 +61,7 @@ cmd(
       
       if (!response.data || !response.data.status) {
         return await conn.sendMessage(from, { 
-          text: `❌ *𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚊𝚙𝚙𝚜*\n\n𝚁𝚎𝚊𝚜𝚘𝚗: ${response.data?.message || 'No results found'}\n\n> © Powered by Sila Tech`, 
+          text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ❌ *Failed to search apps*\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ Reason: ${response.data?.message || 'No results found'}\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
           contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
       }
@@ -70,23 +70,23 @@ cmd(
       
       if (!searchResults || searchResults.length === 0) {
         return await conn.sendMessage(from, { 
-          text: `❌ *𝙽𝚘 𝚊𝚙𝚙𝚜 𝚏𝚘𝚞𝚗𝚍 𝚏𝚘𝚛* "${searchQuery}"\n\n𝙿𝚕𝚎𝚊𝚜𝚎 𝚝𝚛𝚢 𝚊 𝚍𝚒𝚏𝚏𝚎𝚛𝚎𝚗𝚝 𝚜𝚎𝚊𝚛𝚌𝚑 𝚝𝚎𝚛𝚖.\n\n> © Powered by Sila Tech`, 
+          text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ❌ *No apps found for* "${searchQuery}"\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ Please try a different search term.\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
           contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
       }
 
       // If multiple results found, show selection menu
       if (searchResults.length > 1) {
-        let menuText = `🔍 *𝚂𝚎𝚊𝚛𝚌𝚑 𝚁𝚎𝚜𝚞𝚕𝚝𝚜 𝚏𝚘𝚛* "${searchQuery}"\n\n`;
+        let menuText = `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ 🔍 *Search Results for* "${searchQuery}"\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n`;
         
         searchResults.slice(0, 5).forEach((app, index) => {
-          menuText += `*${index + 1}.* ${app.judul}\n`;
-          menuText += `   👤 ${app.dev || 'Unknown'}\n`;
-          menuText += `   ⭐ ${app.rating || 'N/A'}\n`;
-          menuText += `   🔗 Reply with *${index + 1}* to select\n\n`;
+          menuText += `┃ *${index + 1}.* ${app.judul}\n`;
+          menuText += `┃   👤 ${app.dev || 'Unknown'}\n`;
+          menuText += `┃   ⭐ ${app.rating || 'N/A'}\n`;
+          menuText += `┃   🔗 Reply with *${index + 1}* to select\n┃\n`;
         });
         
-        menuText += `> © Powered by Sila Tech`;
+        menuText += `┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`;
 
         // Store results temporarily for selection
         global.apkSearchResults = global.apkSearchResults || {};
@@ -96,7 +96,7 @@ cmd(
         };
 
         return await conn.sendMessage(from, {
-          image: { url: searchResults[0].thumb || 'https://i.imgur.com/placeholder.png' },
+          image: { url: searchResults[0].thumb || 'https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg' },
           caption: menuText,
           contextInfo: getContextInfo({ sender: sender })
         }, { quoted: fkontak });
@@ -109,7 +109,7 @@ cmd(
       console.error("APK Search Error:", e);
       
       await conn.sendMessage(from, { 
-        text: `⚠️ *𝙴𝚛𝚛𝚘𝚛:* ${e.message}\n\n𝙿𝚕𝚎𝚊𝚜𝚎 𝚝𝚛𝚢 𝚊𝚐𝚊𝚒𝚗 𝚕𝚊𝚝𝚎𝚛.\n\n> © Powered by Sila Tech`, 
+        text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ⚠️ *Error:* ${e.message}\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ Please try again later.\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
@@ -134,22 +134,11 @@ async function downloadAndSendApp(conn, from, sender, m, appData) {
     const downloadUrl = downloadData.download || downloadData.url || appData.link;
 
     // Prepare app info
-    const appInfo = `
-📱 *𝙰𝙿𝙺 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚎𝚛*
-
-*𝙰𝚙𝚙:* ${appData.judul}
-*𝙳𝚎𝚟𝚎𝚕𝚘𝚙𝚎𝚛:* ${appData.dev || 'Unknown'}
-*𝚁𝚊𝚝𝚒𝚗𝚐:* ⭐ ${appData.rating || 'N/A'}
-*𝚂𝚒𝚣𝚎:* ${downloadData.size || 'Unknown'}
-
-⬇️ *𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚒𝚗𝚐...*
-
-> © Powered by Sila Tech
-    `;
+    const appInfo = `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ 📱 *APK DOWNLOADER*\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ *App:* ${appData.judul}\n┃ *Developer:* ${appData.dev || 'Unknown'}\n┃ *Rating:* ⭐ ${appData.rating || 'N/A'}\n┃ *Size:* ${downloadData.size || 'Unknown'}\n┃\n┃ ⬇️ *Downloading...*\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`;
 
     // Send app info with thumbnail
     await conn.sendMessage(from, {
-      image: { url: appData.thumb || 'https://i.imgur.com/placeholder.png' },
+      image: { url: appData.thumb || 'https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg' },
       caption: appInfo,
       contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fkontak });
@@ -159,7 +148,7 @@ async function downloadAndSendApp(conn, from, sender, m, appData) {
       document: { url: downloadUrl },
       mimetype: "application/vnd.android.package-archive",
       fileName: `${appData.judul.replace(/[^a-zA-Z0-9]/g, '_')}.apk`,
-      caption: `✅ *${appData.judul} downloaded successfully*\n\n> © Powered by Sila Tech`,
+      caption: `✅ *${appData.judul} downloaded successfully*\n\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`,
       contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fkontak });
 
@@ -184,7 +173,7 @@ cmd({
   try {
     if (!global.apkSearchResults || !global.apkSearchResults[sender]) {
       return await conn.sendMessage(from, { 
-        text: "❌ *𝙽𝚘 𝚊𝚌𝚝𝚒𝚟𝚎 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚞𝚗𝚍*\n\n𝙿𝚕𝚎𝚊𝚜𝚎 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚊𝚗 𝚊𝚙𝚙 𝚏𝚒𝚛𝚜𝚝 𝚞𝚜𝚒𝚗𝚐 .apk", 
+        text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ❌ *No active search found*\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ Please search for an app first using .apk\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
@@ -195,7 +184,7 @@ cmd({
     if (Date.now() - searchData.timestamp > 5 * 60 * 1000) {
       delete global.apkSearchResults[sender];
       return await conn.sendMessage(from, { 
-        text: "❌ *𝚂𝚎𝚊𝚛𝚌𝚑 𝚎𝚡𝚙𝚒𝚛𝚎𝚍*\n\n𝙿𝚕𝚎𝚊𝚜𝚎 𝚜𝚎𝚊𝚛𝚌𝚑 𝚊𝚐𝚊𝚒𝚗 𝚞𝚜𝚒𝚗𝚐 .apk", 
+        text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ❌ *Search expired*\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ Please search again using .apk\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
@@ -205,7 +194,7 @@ cmd({
     
     if (isNaN(selection) || selection < 1 || selection > searchData.results.length) {
       return await conn.sendMessage(from, { 
-        text: `❌ *𝙸𝚗𝚟𝚊𝚕𝚒𝚍 𝚜𝚎𝚕𝚎𝚌𝚝𝚒𝚘𝚗*\n\n𝙿𝚕𝚎𝚊𝚜𝚎 𝚌𝚑𝚘𝚘𝚜𝚎 1-${searchData.results.length}`, 
+        text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ❌ *Invalid selection*\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ Please choose 1-${searchData.results.length}\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
@@ -221,7 +210,7 @@ cmd({
   } catch (e) {
     console.error("Selection Error:", e);
     await conn.sendMessage(from, { 
-      text: `⚠️ *𝙴𝚛𝚛𝚘𝚛:* ${e.message}`, 
+      text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ⚠️ *Error:* ${e.message}\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
       contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fkontak });
   }
