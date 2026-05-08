@@ -1,27 +1,14 @@
 const { cmd } = require("../command");
 const axios = require("axios");
 
-// FakevCard sawa na zilizopita
-const fkontak = {
-    "key": {
-        "participant": '0@s.whatsapp.net',
-        "remoteJid": '0@s.whatsapp.net',
-        "fromMe": false,
-        "id": "Halo"
-    },
-    "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
-    }
-};
-
 const getContextInfo = (m) => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         }
     };
@@ -38,26 +25,21 @@ cmd(
     react: "🎵",
     filename: __filename,
   },
-  async (conn, mek, m, { from, q, sender, args }) => {
+  async (conn, mek, m, { from, q, sender, args, reply }) => {
     try {
       if (processedMessages.has(m.key.id)) return;
       processedMessages.add(m.key.id);
       setTimeout(() => processedMessages.delete(m.key.id), 5 * 60 * 1000);
 
       if (!q) {
-        return await conn.sendMessage(from, { 
-          text: "👉 *𝙿𝚕𝚎𝚊𝚜𝚎 𝚙𝚛𝚘𝚟𝚒𝚍𝚎 𝚊 𝚃𝚒𝚔𝚃𝚘𝚔 𝚟𝚒𝚍𝚎𝚘 𝚕𝚒𝚗𝚔*\n\n*Example:* .tiktok https://www.tiktok.com/@user/video/123456789\n\n> © Powered by Sila Tech", 
-          contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        return reply("*Please provide a TikTok video link*\n\n*Example:* .tiktok https://www.tiktok.com/@user/video/123456789\n\n> ® Powered by Tyrex Tech");
       }
 
       await conn.sendMessage(from, { react: { text: "⏳", key: m.key } });
 
-      // Extract quality option if provided (hd, nowm, wm, audio)
-      let quality = "no_watermark"; // default
+      let quality = "no_watermark";
       let url = q;
-      
-      // Check if user specified quality (format: .tiktok hd <url> or .tiktok audio <url>)
+
       const parts = q.split(' ');
       if (parts.length > 1) {
         const possibleQuality = parts[0].toLowerCase();
@@ -68,34 +50,24 @@ cmd(
         }
       }
 
-      // Clean URL - remove any extra spaces
       const tiktokUrl = url.trim();
-      
-      // Validate URL
+
       if (!tiktokUrl.includes('tiktok.com')) {
-        return await conn.sendMessage(from, { 
-          text: "❌ *𝙸𝚗𝚟𝚊𝚕𝚒𝚍 𝚃𝚒𝚔𝚃𝚘𝚔 𝚄𝚁𝙻*\n\n𝙿𝚕𝚎𝚊𝚜𝚎 𝚙𝚛𝚘𝚟𝚒𝚍𝚎 𝚊 𝚟𝚊𝚕𝚒𝚍 𝚃𝚒𝚔𝚃𝚘𝚔 𝚟𝚒𝚍𝚎𝚘 𝚕𝚒𝚗𝚔.\n\n> © Powered by Sila Tech", 
-          contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        return reply("*Invalid TikTok URL*\n\nPlease provide a valid TikTok video link.\n\n> ® Powered by Tyrex Tech");
       }
 
-      // API request
       const apiUrl = `https://api.bk9.dev/download/tiktok3?url=${encodeURIComponent(tiktokUrl)}`;
       const response = await axios.get(apiUrl);
-      
+
       if (!response.data || !response.data.status) {
-        return await conn.sendMessage(from, { 
-          text: `❌ *𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚏𝚎𝚝𝚌𝚑 𝚟𝚒𝚍𝚎𝚘*\n\n𝚁𝚎𝚊𝚜𝚘𝚗: ${response.data?.message || 'Invalid URL or video not found'}\n\n> © Powered by Sila Tech`, 
-          contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        return reply(`*Failed to fetch video*\n\nReason: ${response.data?.message || 'Invalid URL or video not found'}\n\n> ® Powered by Tyrex Tech`);
       }
 
       const tiktokData = response.data.BK9;
-      
-      // Find the requested quality
+
       let selectedFormat = null;
       let qualityDisplay = "";
-      
+
       switch(quality) {
         case 'hd':
           selectedFormat = tiktokData.formats.find(f => f.quality === 'hd_no_watermark');
@@ -116,68 +88,64 @@ cmd(
           qualityDisplay = "Audio Only";
           break;
         default:
-          selectedFormat = tiktokData.formats[1] || tiktokData.formats[0]; // Default to no watermark
+          selectedFormat = tiktokData.formats[1] || tiktokData.formats[0];
           qualityDisplay = "No Watermark";
       }
 
       if (!selectedFormat) {
-        // Fallback to first available format
         selectedFormat = tiktokData.formats[0];
         qualityDisplay = "Default";
       }
 
-      // Send video info with thumbnail
       const caption = `
-🎵 *𝚃𝚒𝚔𝚃𝚘𝚔 𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚎𝚛*
+🎵 *TikTok Downloader*
 
-📌 *𝚃𝚒𝚝𝚕𝚎:* ${tiktokData.title || 'N/A'}
-👤 *𝙰𝚞𝚝𝚑𝚘𝚛:* ${tiktokData.author || 'N/A'}
-⏱️ *𝙳𝚞𝚛𝚊𝚝𝚒𝚘𝚗:* ${tiktokData.duration || 'N/A'}
-🎚️ *𝚀𝚞𝚊𝚕𝚒𝚝𝚢:* ${qualityDisplay}
+📌 *Title:* ${tiktokData.title || 'N/A'}
+👤 *Author:* ${tiktokData.author || 'N/A'}
+⏱️ *Duration:* ${tiktokData.duration || 'N/A'}
+🎚️ *Quality:* ${qualityDisplay}
 
-⬇️ *𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍𝚒𝚗𝚐...*
+⬇️ *Downloading...*
 
-> © Powered by Sila Tech
+> ® Powered by Tyrex Tech
       `;
 
-      // Send thumbnail
       if (tiktokData.thumbnail) {
         await conn.sendMessage(from, {
           image: { url: tiktokData.thumbnail },
           caption: caption,
           contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
       } else {
         await conn.sendMessage(from, { 
           text: caption,
           contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
       }
 
-      // Send media based on type
       if (selectedFormat.type === 'audio') {
         await conn.sendMessage(from, {
           audio: { url: selectedFormat.url },
           mimetype: "audio/mpeg",
           fileName: `tiktok_audio_${Date.now()}.mp3`,
-          caption: `✅ *Audio downloaded successfully*\n\n> © Powered by Sila Tech`,
+          caption: `✅ *Audio downloaded successfully*\n\n> ® Powered by Tyrex Tech`,
           contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
       } else {
         await conn.sendMessage(from, {
           video: { url: selectedFormat.url },
-          caption: `✅ *Video downloaded successfully*\n\n🎚️ *Quality:* ${qualityDisplay}\n\n> © Powered by Sila Tech`,
+          caption: `✅ *Video downloaded successfully*\n\n🎚️ *Quality:* ${qualityDisplay}\n\n> ® Powered by Tyrex Tech`,
           mimetype: "video/mp4",
           fileName: `tiktok_${Date.now()}.mp4`,
           contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
       }
 
       await conn.sendMessage(from, { react: { text: "✅", key: m.key } });
 
     } catch (e) {
       console.error("TikTok Download Error:", e);
-      
+
       let errorMessage = e.message;
       if (e.response?.status === 404) {
         errorMessage = "Video not found. Make sure the URL is correct and the video is public.";
@@ -185,10 +153,7 @@ cmd(
         errorMessage = "Connection to API server failed.";
       }
 
-      await conn.sendMessage(from, { 
-        text: `⚠️ *𝙴𝚛𝚛𝚘𝚛:* ${errorMessage}\n\n*Example:* .tiktok https://www.tiktok.com/@user/video/123456789\n\n> © Powered by Sila Tech`, 
-        contextInfo: getContextInfo({ sender: sender })
-      }, { quoted: fkontak });
+      reply(`*Error:* ${errorMessage}\n\n*Example:* .tiktok https://www.tiktok.com/@user/video/123456789\n\n> ® Powered by Tyrex Tech`);
     }
   }
 );
