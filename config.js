@@ -7,127 +7,127 @@ function convertToBool(text, fault = 'true') {
 
 module.exports = {
 SESSION_ID: process.env.SESSION_ID || "",
-// 𝖆𝖉𝖉 𝖞𝖔𝖚𝖗 𝖘𝖊𝖘𝖘𝖎𝖔𝖓 𝖎𝖉
+// add your session id
 
 AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN || "true",
-// 𝗺𝗮𝗸𝗲 𝘁𝗿𝘂𝗲/𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝘀𝘁𝗮𝘁𝘂𝘀 𝗮𝘂𝘁𝗼 𝘀𝗲𝗲𝗻
+// make true/false for status auto seen
 
 AUTO_STATUS_REPLY: process.env.AUTO_STATUS_REPLY || "false",
-// 𝗺𝗮𝗸𝗲 𝘁𝗿𝘂𝗲 𝗳𝗼𝗿 𝗮𝘂𝘁𝗼 𝗿𝗲𝗽𝗹𝘆 𝗼𝗻 𝘀𝘁𝗮𝘁𝘂𝘀
+// make true for auto reply on status
 
 AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT || "true",
-// 𝗮𝗻𝘁𝗶𝗰𝗮𝗹𝗹 𝗼𝗻/𝗼𝗳𝗳
+// anticall on/off
 
 ANTI_CALL: process.env.ANTI_CALL || "false",
-// 𝗺𝗮𝗸𝗲 𝘁𝗿𝘂𝗲/𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝗮𝗻𝘁𝗶𝗰𝗮𝗹𝗹
+// make true/false for anticall
 
 CUSTOM_STATUS_EMOJIS: process.env.CUSTOM_STATUS_EMOJIS || "❤️,✨,🔥,💯,✅,👑",
-// 𝘀𝘁𝗮𝘁𝘂𝘀 𝗿𝗲𝗮𝗰𝘁𝗶𝗼𝗻 𝗲𝗺𝗼𝗷𝗶𝘀
+// status reaction emojis
 
-AUTO_STATUS_MSG: process.env.AUTO_STATUS_MSG || "*𝐒𝐈𝐋𝐀-𝐌𝐃 𝐕𝐈𝐄𝐖𝐄𝐃✅*",
-// 𝗮𝘂𝘁𝗼 𝗿𝗲𝗽𝗹𝘆 𝗺𝗲𝘀𝘀𝗮𝗴𝗲 𝗼𝗻 𝘀𝘁𝗮𝘁𝘂𝘀
+AUTO_STATUS_MSG: process.env.AUTO_STATUS_MSG || "*𝐓𝐘𝐑𝐄𝐗-𝐌𝐃 𝐕𝐈𝐄𝐖𝐄𝐃✅*",
+// auto reply message on status
 
 ANTI_DELETE: process.env.ANTI_DELETE || "false",
-// 𝘁𝗿𝘂𝗲/𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝗮𝗻𝘁𝗶 𝗱𝗲𝗹𝗲𝘁𝗲
+// true/false for anti delete
 
 ANTI_DEL_PATH: process.env.ANTI_DEL_PATH || "index",
-// 𝗰𝗵𝗮𝗻𝗴𝗲 𝘁𝗼 '𝗦𝗮𝗺𝗲' 𝗳𝗼𝗿 𝗿𝗲𝘀𝗲𝗻𝗱 𝗶𝗻 𝘀𝗮𝗺𝗲 𝗰𝗵𝗮𝘁
+// change to 'Same' for resend in same chat
 
 WELCOME: process.env.WELCOME || "false",
-// 𝘁𝗿𝘂𝗲 𝗶𝗳 𝘄𝗮𝗻𝘁 𝘄𝗲𝗹𝗰𝗼𝗺𝗲 & 𝗴𝗼𝗼𝗱𝗯𝘆𝗲 𝗺𝘀𝗴𝘀 𝗶𝗻 𝗴𝗿𝗼𝘂𝗽𝘀
+// true if want welcome & goodbye msgs in groups
 
 ADMIN_EVENTS: process.env.ADMIN_EVENTS || "false",
-// 𝘁𝗿𝘂𝗲 𝘁𝗼 𝗻𝗼𝘁𝗶𝗳𝘆 𝗼𝗻 𝗺𝗲𝗺𝗯𝗲𝗿 𝗽𝗿𝗼𝗺𝗼𝘁𝗲/𝗱𝗲𝗺𝗼𝘁𝗲
+// true to notify on member promote/demote
 
 LINK_WHITELIST: "youtube.com,github.com",
-LINK_ACTION: "mute", // "𝗸𝗶𝗰𝗸", "𝗺𝘂𝘁𝗲", 𝗼𝗿 "𝗻𝗼𝗻𝗲"
-LINK_WARN_LIMIT: 3, // 𝗪𝗮𝗿𝗻𝗶𝗻𝗴𝘀 𝗯𝗲𝗳𝗼𝗿𝗲 𝗮𝗰𝘁𝗶𝗼𝗻
+LINK_ACTION: "mute", // "kick", "mute", or "none"
+LINK_WARN_LIMIT: 3, // Warnings before action
 
 ANTI_LINK: process.env.ANTI_LINK || "true",
-// 𝗺𝗮𝗸𝗲 𝘁𝗿𝘂𝗲/𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝗮𝗻𝘁𝗶-𝗹𝗶𝗻𝗸 𝗶𝗻 𝗴𝗿𝗼𝘂𝗽𝘀
+// make true/false for anti-link in groups
 
 MENTION_REPLY: process.env.MENTION_REPLY || "false",
-// 𝘁𝗿𝘂𝗲 𝗳𝗼𝗿 𝗮𝘂𝘁𝗼 𝘃𝗼𝗶𝗰𝗲 𝗿𝗲𝗽𝗹𝘆 𝘄𝗵𝗲𝗻 𝗺𝗲𝗻𝘁𝗶𝗼𝗻𝗲𝗱
+// true for auto voice reply when mentioned
 
-MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://files.catbox.moe/i4aqjo.png",
-// 𝗰𝘂𝘀𝘁𝗼𝗺 𝗺𝗲𝗻𝘂 & 𝗺𝗲𝗻𝘁𝗶𝗼𝗻 𝗿𝗲𝗽𝗹𝘆 𝗶𝗺𝗮𝗴𝗲
+MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg",
+// custom menu & mention reply image
 
 PREFIX: process.env.PREFIX || ".",
-// 𝗯𝗼𝘁 𝗰𝗼𝗺𝗺𝗮𝗻𝗱 𝗽𝗿𝗲𝗳𝗶𝘅
+// bot command prefix
 
 AUTO_BIO: process.env.AUTO_BIO || "false",
-TIME_ZONE: process.env.TIME_ZONE || "Africa/Dar_es_Salaam",  // 𝗖𝗵𝗮𝗻𝗴𝗲 𝘁𝗼 𝘆𝗼𝘂𝗿 𝘁𝗶𝗺𝗲𝘇𝗼𝗻𝗲
-// 𝗮𝘂𝘁𝗼-𝗯𝗶𝗼 𝗳𝗲𝗮𝘁𝘂𝗿𝗲 𝘀𝗲𝘁𝘁𝗶𝗻𝗴𝘀
+TIME_ZONE: process.env.TIME_ZONE || "Africa/Dar_es_Salaam",  // Change to your timezone
+// auto-bio feature settings
 
-BOT_NAME: process.env.BOT_NAME || "𝐒𝐈𝐋𝐀-𝐌𝐃",
-// 𝗯𝗼𝘁 𝗻𝗮𝗺𝗲 𝗳𝗼𝗿 𝗺𝗲𝗻𝘂
+BOT_NAME: process.env.BOT_NAME || "𝐓𝐘𝐑𝐄𝐗-𝐌𝐃",
+// bot name for menu
 
-STICKER_NAME: process.env.STICKER_NAME || "𝐒𝐈𝐋𝐀-𝐌𝐃",
-// 𝘀𝘁𝗶𝗰𝗸𝗲𝗿 𝗽𝗮𝗰𝗸 𝗻𝗮𝗺𝗲
+STICKER_NAME: process.env.STICKER_NAME || "𝐓𝐘𝐑𝐄𝐗-𝐌𝐃",
+// sticker pack name
 
 CUSTOM_REACT: process.env.CUSTOM_REACT || "false",
-// 𝘁𝗿𝘂𝗲/𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝗰𝘂𝘀𝘁𝗼𝗺 𝗲𝗺𝗼𝗷𝗶 𝗿𝗲𝗮𝗰𝘁
+// true/false for custom emoji react
 
 CUSTOM_REACT_EMOJIS: process.env.CUSTOM_REACT_EMOJIS || "💝,💖,💗,❤️‍🩹,❤️,🧡,💛,💚,💙,💜,🤎,🖤,🤍",
-// 𝗰𝘂𝘀𝘁𝗼𝗺 𝗿𝗲𝗮𝗰𝘁 𝗲𝗺𝗼𝗷𝗶𝘀
+// custom react emojis
 
 DELETE_LINKS: process.env.DELETE_LINKS || "false",
-// 𝗮𝘂𝘁𝗼𝗺𝗮𝘁𝗶𝗰𝗮𝗹𝗹𝘆 𝗱𝗲𝗹𝗲𝘁𝗲 𝗹𝗶𝗻𝗸𝘀 𝘄𝗶𝘁𝗵𝗼𝘂𝘁 𝗿𝗲𝗺𝗼𝘃𝗶𝗻𝗴 𝗺𝗲𝗺𝗯𝗲𝗿
+// automatically delete links without removing member
 
-OWNER_NUMBER: process.env.OWNER_NUMBER || "255768978061,255789661031",
-// 𝗯𝗼𝘁 𝗼𝘄𝗻𝗲𝗿 𝗻𝘂𝗺𝗯𝗲𝗿(𝘀) - 𝘁𝗲𝗻𝗴𝗮𝗻𝗶𝘀𝗵𝗮 𝗸𝘄𝗮 𝗸𝗼𝗺𝗮 (,) 𝗸𝗶𝘄𝗮 𝘇𝗮𝗶𝗱𝗶 𝗬𝗔 𝗠𝗠𝗢𝗝𝗔
+OWNER_NUMBER: process.env.OWNER_NUMBER || "255628378557",
+// bot owner number(s) - separate with comma (,) for multiple
 
-OWNER_NAME: process.env.OWNER_NAME || "𝐒𝐈𝐋𝐀-𝐌𝐃",
-// 𝗯𝗼𝘁 𝗼𝘄𝗻𝗲𝗿 𝗻𝗮𝗺𝗲
+OWNER_NAME: process.env.OWNER_NAME || "𝐓𝐘𝐑𝐄𝐗-𝐌𝐃",
+// bot owner name
 
-DESCRIPTION: process.env.DESCRIPTION || "*> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐁𝐲 𝐒𝐢𝐥𝐚 𝐓𝐞𝐜𝐡*",
-// 𝗯𝗼𝘁 𝗱𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻
+DESCRIPTION: process.env.DESCRIPTION || "*> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐁𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡*",
+// bot description
 
-ALIVE_IMG: process.env.ALIVE_IMG || "https://files.catbox.moe/36vahk.png",
-// 𝗮𝗹𝗶𝘃𝗲 𝗺𝗲𝘀𝘀𝗮𝗴𝗲 𝗶𝗺𝗮𝗴𝗲
+ALIVE_IMG: process.env.ALIVE_IMG || "https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg",
+// alive message image
 
-LIVE_MSG: process.env.LIVE_MSG || "> 𝐒𝐈𝐋𝐀-𝐌𝐃",
-// 𝗮𝗹𝗶𝘃𝗲 𝗺𝗲𝘀𝘀𝗮𝗴𝗲
+LIVE_MSG: process.env.LIVE_MSG || "> 𝐓𝐘𝐑𝐄𝐗-𝐌𝐃",
+// alive message
 
 READ_MESSAGE: process.env.READ_MESSAGE || "false",
-// 𝘁𝗿𝘂𝗲/𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝗮𝘂𝘁𝗼 𝗿𝗲𝗮𝗱 𝗺𝘀𝗴𝘀
+// true/false for auto read msgs
 
 AUTO_REACT: process.env.AUTO_REACT || "false",
-// 𝘁𝗿𝘂𝗲/𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝗮𝘂𝘁𝗼 𝗿𝗲𝗮𝗰𝘁 𝗼𝗻 𝗮𝗹𝗹 𝗺𝘀𝗴𝘀
+// true/false for auto react on all msgs
 
 ANTI_BAD: process.env.ANTI_BAD || "false",
-// 𝗳𝗮𝗹𝘀𝗲/𝘁𝗿𝘂𝗲 𝗳𝗼𝗿 𝗮𝗻𝘁𝗶 𝗯𝗮𝗱 𝘄𝗼𝗿𝗱𝘀
+// false/true for anti bad words
 
 MODE: process.env.MODE || "public",
-// 𝘀𝗲𝘁 𝗯𝗼𝘁 𝗺𝗼𝗱𝗲: 𝗽𝘂𝗯𝗹𝗶𝗰-𝗽𝗿𝗶𝘃𝗮𝘁𝗲-𝗶𝗻𝗯𝗼𝘅-𝗴𝗿𝗼𝘂𝗽
+// set bot mode: public-private-inbox-group
 
 SRIHUB_API: process.env.SRIHUB_API || "dew_5H5Dbuh4v7NbkNRmI0Ns2u2ZK240aNnJ9lnYQXR9",
-// 𝘀𝗿𝗶𝗵𝘂𝗯 𝗮𝗽𝗶 𝗸𝗲𝘆
+// srihub api key
 
 AUTO_STICKER: process.env.AUTO_STICKER || "false",
-// 𝘁𝗿𝘂𝗲 𝗳𝗼𝗿 𝗮𝘂𝘁𝗼𝗺𝗮𝘁𝗶𝗰 𝘀𝘁𝗶𝗰𝗸𝗲𝗿𝘀
+// true for automatic stickers
 
 AUTO_REPLY: process.env.AUTO_REPLY || "true",
-// 𝘁𝗿𝘂𝗲/𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝗮𝘂𝘁𝗼𝗺𝗮𝘁𝗶𝗰 𝘁𝗲𝘅𝘁 𝗿𝗲𝗽𝗹𝘆
+// true/false for automatic text reply
 
 ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "true",
-// 𝗺𝗮𝗸𝗲 𝘁𝗿𝘂𝗲 𝗳𝗼𝗿 𝗮𝗹𝘄𝗮𝘆𝘀 𝗼𝗻𝗹𝗶𝗻𝗲
+// make true for always online
 
 PUBLIC_MODE: process.env.PUBLIC_MODE || "true",
-// 𝗺𝗮𝗸𝗲 𝗳𝗮𝗹𝘀𝗲 𝗳𝗼𝗿 𝗽𝗿𝗶𝘃𝗮𝘁𝗲 𝗺𝗼𝗱𝗲
+// make false for private mode
 
 AUTO_TYPING: process.env.AUTO_TYPING || "true",
-// 𝘁𝗿𝘂𝗲 𝗳𝗼𝗿 𝗮𝘂𝘁𝗼 𝘀𝗵𝗼𝘄 𝘁𝘆𝗽𝗶𝗻𝗴
+// true for auto show typing
 
 READ_CMD: process.env.READ_CMD || "false",
-// 𝘁𝗿𝘂𝗲 𝗶𝗳 𝘄𝗮𝗻𝘁 𝘁𝗼 𝗺𝗮𝗿𝗸 𝗰𝗼𝗺𝗺𝗮𝗻𝗱𝘀 𝗮𝘀 𝗿𝗲𝗮𝗱
+// true if want to mark commands as read
 
-DEV: process.env.DEV || "255768978061",
-// 𝗱𝗲𝘃𝗲𝗹𝗼𝗽𝗲𝗿 𝘄𝗵𝗮𝘁𝘀𝗮𝗽𝗽 𝗻𝘂𝗺𝗯𝗲𝗿
+DEV: process.env.DEV || "255628378557",
+// developer whatsapp number
 
 ANTI_VV: process.env.ANTI_VV || "true",
-// 𝘁𝗿𝘂𝗲 𝗳𝗼𝗿 𝗮𝗻𝘁𝗶 𝗼𝗻𝗰𝗲 𝘃𝗶𝗲𝘄
+// true for anti once view
 
 AUTO_RECORDING: process.env.AUTO_RECORDING || "false"
-// 𝗺𝗮𝗸𝗲 𝗶𝘁 𝘁𝗿𝘂𝗲 𝗳𝗼𝗿 𝗮𝘂𝘁𝗼 𝗿𝗲𝗰𝗼𝗿𝗱𝗶𝗻𝗴
+// make it true for auto recording
 };
