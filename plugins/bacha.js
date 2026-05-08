@@ -1,6 +1,5 @@
 const { cmd } = require("../command");
 
-// FakevCard sawa na zilizopita
 const fkontak = {
     "key": {
         "participant": '0@s.whatsapp.net',
@@ -9,7 +8,7 @@ const fkontak = {
         "id": "Halo"
     },
     "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
+        "conversation": "𝐓𝐘𝐑𝐄𝐗"
     }
 };
 
@@ -19,8 +18,8 @@ const getContextInfo = (m) => {
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         }
     };
@@ -38,14 +37,14 @@ cmd({
   try {
     if (!isGroup) {
       return await conn.sendMessage(from, { 
-        text: "❌ 𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚌𝚊𝚗 𝚘𝚗𝚕𝚢 𝚋𝚎 𝚞𝚜𝚎𝚍 𝚒𝚗 𝚐𝚛𝚘𝚞𝚙𝚜!\n\n> © Powered by Sila Tech", 
+        text: "This command can only be used in groups!\n\n> ® Powered by Tyrex Tech", 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
     
     if (!groupMetadata?.participants) {
       return await conn.sendMessage(from, { 
-        text: "⚠️ 𝙲𝚘𝚞𝚕𝚍𝚗'𝚝 𝚏𝚎𝚝𝚌𝚑 𝚐𝚛𝚘𝚞𝚙 𝚖𝚎𝚖𝚋𝚎𝚛𝚜.\n\n> © Powered by Sila Tech", 
+        text: "Couldn't fetch group members.\n\n> ® Powered by Tyrex Tech", 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
@@ -55,7 +54,7 @@ cmd({
 
     if (participants.length < 1) {
       return await conn.sendMessage(from, { 
-        text: "❌ 𝙽𝚘 𝚎𝚕𝚒𝚐𝚒𝚋𝚕𝚎 𝚙𝚊𝚛𝚝𝚒𝚌𝚒𝚙𝚊𝚗𝚝𝚜 𝚏𝚘𝚞𝚗𝚍!\n\n> © Powered by Sila Tech", 
+        text: "No eligible participants found!\n\n> ® Powered by Tyrex Tech", 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
@@ -65,7 +64,7 @@ cmd({
     await conn.sendMessage(
       from,
       {
-        text: `👦 *𝚈𝚎𝚑 𝚕𝚘 𝚝𝚞𝚖𝚑𝚊𝚛𝚊 𝙱𝚊𝚌𝚑𝚊!*\n\n@${randomUser.id.split('@')[0]} 𝚒𝚜 𝚢𝚘𝚞𝚛 𝚑𝚊𝚗𝚍𝚜𝚘𝚖𝚎 𝚋𝚘𝚢! 😎\n\n> © Powered by Sila Tech`,
+        text: `👦 *Here is your Boy!*\n\n@${randomUser.id.split('@')[0]} is your handsome boy! 😎\n\n> ® Powered by Tyrex Tech`,
         mentions: [randomUser.id],
         contextInfo: getContextInfo({ sender: sender })
       },
@@ -75,7 +74,7 @@ cmd({
   } catch (error) {
     console.error("Error in .bacha command:", error);
     await conn.sendMessage(from, { 
-      text: "❌ 𝙰𝚗 𝚎𝚛𝚛𝚘𝚛 𝚘𝚌𝚌𝚞𝚛𝚛𝚎𝚍 𝚠𝚑𝚒𝚕𝚎 𝚜𝚎𝚕𝚎𝚌𝚝𝚒𝚗𝚐 𝚊 𝚋𝚘𝚢.\n\n> © Powered by Sila Tech", 
+      text: "An error occurred while selecting a boy.\n\n> ® Powered by Tyrex Tech", 
       contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fkontak });
   }
@@ -93,14 +92,14 @@ cmd({
   try {
     if (!isGroup) {
       return await conn.sendMessage(from, { 
-        text: "❌ 𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚌𝚊𝚗 𝚘𝚗𝚕𝚢 𝚋𝚎 𝚞𝚜𝚎𝚍 𝚒𝚗 𝚐𝚛𝚘𝚞𝚙𝚜!\n\n> © Powered by Sila Tech", 
+        text: "This command can only be used in groups!\n\n> ® Powered by Tyrex Tech", 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
     
     if (!groupMetadata?.participants) {
       return await conn.sendMessage(from, { 
-        text: "⚠️ 𝙲𝚘𝚞𝚕𝚍𝚗'𝚝 𝚏𝚎𝚝𝚌𝚑 𝚐𝚛𝚘𝚞𝚙 𝚖𝚎𝚖𝚋𝚎𝚛𝚜.\n\n> © Powered by Sila Tech", 
+        text: "Couldn't fetch group members.\n\n> ® Powered by Tyrex Tech", 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
@@ -110,7 +109,7 @@ cmd({
 
     if (participants.length < 1) {
       return await conn.sendMessage(from, { 
-        text: "❌ 𝙽𝚘 𝚎𝚕𝚒𝚐𝚒𝚋𝚕𝚎 𝚙𝚊𝚛𝚝𝚒𝚌𝚒𝚙𝚊𝚗𝚝𝚜 𝚏𝚘𝚞𝚗𝚍!\n\n> © Powered by Sila Tech", 
+        text: "No eligible participants found!\n\n> ® Powered by Tyrex Tech", 
         contextInfo: getContextInfo({ sender: sender })
       }, { quoted: fkontak });
     }
@@ -120,7 +119,7 @@ cmd({
     await conn.sendMessage(
       from,
       {
-        text: `👧 *𝚈𝚎𝚑 𝚕𝚘 𝚝𝚞𝚖𝚑𝚊𝚛𝚒 𝙱𝚊𝚌𝚑𝚒!*\n\n@${randomUser.id.split('@')[0]} 𝚒𝚜 𝚢𝚘𝚞𝚛 𝚋𝚎𝚊𝚞𝚝𝚒𝚏𝚞𝚕 𝚐𝚒𝚛𝚕! 💖\n\n> © Powered by Sila Tech`,
+        text: `👧 *Here is your Girl!*\n\n@${randomUser.id.split('@')[0]} is your beautiful girl! 💖\n\n> ® Powered by Tyrex Tech`,
         mentions: [randomUser.id],
         contextInfo: getContextInfo({ sender: sender })
       },
@@ -130,7 +129,7 @@ cmd({
   } catch (error) {
     console.error("Error in .bachi command:", error);
     await conn.sendMessage(from, { 
-      text: "❌ 𝙰𝚗 𝚎𝚛𝚛𝚘𝚛 𝚘𝚌𝚌𝚞𝚛𝚛𝚎𝚍 𝚠𝚑𝚒𝚕𝚎 𝚜𝚎𝚕𝚎𝚌𝚝𝚒𝚗𝚐 𝚊 𝚐𝚒𝚛𝚕.\n\n> © Powered by Sila Tech", 
+      text: "An error occurred while selecting a girl.\n\n> ® Powered by Tyrex Tech", 
       contextInfo: getContextInfo({ sender: sender })
     }, { quoted: fkontak });
   }
