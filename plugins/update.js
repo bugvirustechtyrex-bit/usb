@@ -16,7 +16,6 @@ cmd({
   from, sender, pushname, reply
 }) => {
   try {
-    // Read local version data
     const localVersionPath = path.join(__dirname, '../data/version.json');
     let localVersion = 'Unknown';
     let changelog = 'No changelog available.';
@@ -26,8 +25,7 @@ cmd({
       changelog = localData.changelog;
     }
 
-    // Fetch latest version data from GitHub
-    const rawVersionUrl = 'https://raw.githubusercontent.com/codertz26-code/usb/main/data/version.json';
+    const rawVersionUrl = 'https://raw.githubusercontent.com/bugvirustechtyrex-bit/Tyrex-MD/main/data/version.json';
     let latestVersion = 'Unknown';
     let latestChangelog = 'No changelog available.';
     try {
@@ -38,27 +36,22 @@ cmd({
       console.error('Failed to fetch latest version:', error);
     }
 
-    // Count total plugins
     const pluginPath = path.join(__dirname, '../plugins');
     const pluginCount = fs.readdirSync(pluginPath).filter(file => file.endsWith('.js')).length;
 
-    // Count total registered commands
     const totalCommands = commands.length;
 
-    // System info
     const uptime = runtime(process.uptime());
     const ramUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
     const totalRam = (os.totalmem() / 1024 / 1024).toFixed(2);
     const hostName = os.hostname();
     const lastUpdate = fs.existsSync(localVersionPath) ? fs.statSync(localVersionPath).mtime.toLocaleString() : 'N/A';
 
-    // GitHub stats
-    const githubRepo = 'https://github.com/codertz26-code/usb';
+    const githubRepo = 'https://github.com/bugvirustechtyrex-bit/Tyrex-MD';
 
-    // Check update status
-    let updateMessage = `✅ Your SILA-MD bot is up-to-date!`;
+    let updateMessage = `✅ Your TYREX MD bot is up-to-date!`;
     if (localVersion !== latestVersion && latestVersion !== 'Unknown') {
-      updateMessage = `🚀 Your SILA-MD bot is outdated!
+      updateMessage = `🚀 Your TYREX MD bot is outdated!
 🔹 *Current Version:* ${localVersion}
 🔹 *Latest Version:* ${latestVersion}
 
@@ -66,22 +59,21 @@ Use *.update* to update.`;
     }
 
     const statusMessage = `🌟 *Good ${new Date().getHours() < 12 ? 'Morning' : 'Night'}, ${pushname}!* 🌟\n\n` +
-      `📌 *Bot Name:* SILA-MD\n🔖 *Current Version:* ${localVersion}\n📢 *Latest Version:* ${latestVersion}\n📂 *Total Plugins:* ${pluginCount}\n🔢 *Total Commands:* ${totalCommands}\n\n` +
+      `📌 *Bot Name:* TYREX MD\n🔖 *Current Version:* ${localVersion}\n📢 *Latest Version:* ${latestVersion}\n📂 *Total Plugins:* ${pluginCount}\n🔢 *Total Commands:* ${totalCommands}\n\n` +
       `💾 *System Info:*\n⏳ *Uptime:* ${uptime}\n📟 *RAM Usage:* ${ramUsage}MB / ${totalRam}MB\n⚙️ *Host Name:* ${hostName}\n📅 *Last Update:* ${lastUpdate}\n\n` +
       `📝 *Changelog:*\n${latestChangelog}\n\n` +
-      `⭐ *GitHub Repo:* ${githubRepo}\n👤 *Owner:* [Codertz26](https://github.com/codertz26-code)\n\n${updateMessage}\n\n🚀 *Hey! Don't forget to fork & star the repo!*`;
+      `⭐ *GitHub Repo:* ${githubRepo}\n👤 *Owner:* [Tyrex Tech](https://github.com/bugvirustechtyrex-bit)\n\n${updateMessage}\n\n🚀 *Hey! Don't forget to fork & star the repo!*\n\n> ® Powered by Tyrex Tech`;
 
-    // Send the status message with your image
     await conn.sendMessage(from, {
-      image: { url: 'https://files.catbox.moe/i4aqjo.png' },
+      image: { url: 'https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg' },
       caption: statusMessage,
       contextInfo: {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363402325089913@newsletter',
-          newsletterName: 'SILA-MD',
+          newsletterJid: '120363424973782944@newsletter',
+          newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
           serverMessageId: 143
         }
       }
