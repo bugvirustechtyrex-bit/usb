@@ -3,7 +3,7 @@ const config = require('../config');
 const { cmd } = require('../command');
 const fs = require('fs');
 
-// FakevCard sawa na zilizopita
+// FakevCard ya TYREX MD
 const fkontak = {
     "key": {
         "participant": '0@s.whatsapp.net',
@@ -12,26 +12,26 @@ const fkontak = {
         "id": "Halo"
     },
     "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
+        "conversation": "𝐓𝐘𝐑𝐄𝐗"
     }
 };
 
-const getContextInfo = (m, ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃", formattedOwnerNumber = "255789661031") => {
+const getContextInfo = (m, ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃", formattedOwnerNumber = "255628378557") => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         },
         externalAdReply: {
-            title: `👑 𝙱𝙾𝚃 𝙾𝚆𝙽𝙴𝚁: ${ownerName}`,
-            body: `📞 wa.me/${formattedOwnerNumber}`,
+            title: `👑 BOT OWNER: ${ownerName}`,
+            body: `wa.me/${formattedOwnerNumber}`,
             mediaType: 1,
             previewType: 0,
-            thumbnailUrl: 'https://files.catbox.moe/98k75b.jpeg',
+            thumbnailUrl: 'https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg',
             sourceUrl: `https://wa.me/${formattedOwnerNumber}`,
             renderLargerThumbnail: false,
         }
@@ -39,23 +39,23 @@ const getContextInfo = (m, ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃", formattedOwn
 };
 
 let bioInterval;
-const defaultBio = config.AUTO_BIO_TEXT || "𝚂𝙸𝙻𝙰 𝙼𝙳 | 𝚀𝚞𝚘𝚝𝚎: {quote} | 𝚃𝚒𝚖𝚎: {time}";
+const defaultBio = config.AUTO_BIO_TEXT || "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃 | Quote: {quote} | Time: {time}";
 const quoteApiUrl = config.QUOTE_API_URL || 'https://apis.davidcyriltech.my.id/random/quotes';
 const updateInterval = config.AUTO_BIO_INTERVAL || 30 * 1000;
 
 // Fallback quotes
 const fallbackQuotes = [
-    "𝚂𝚝𝚊𝚢 𝚌𝚞𝚛𝚒𝚘𝚞𝚜, 𝚔𝚎𝚎𝚙 𝚕𝚎𝚊𝚛𝚗𝚒𝚗𝚐!",
-    "𝙳𝚛𝚎𝚊𝚖 𝚋𝚒𝚐, 𝚠𝚘𝚛𝚔 𝚑𝚊𝚛𝚍!",
-    "𝚃𝚑𝚎 𝚋𝚎𝚜𝚝 𝚒𝚜 𝚢𝚎𝚝 𝚝𝚘 𝚌𝚘𝚖𝚎.",
-    "𝙺𝚎𝚎𝚙 𝚒𝚝 𝚛𝚎𝚊𝚕, 𝚊𝚕𝚠𝚊𝚢𝚜.",
-    "𝙻𝚒𝚏𝚎 𝚒𝚜 𝚊 𝚓𝚘𝚞𝚛𝚗𝚎𝚢, 𝚎𝚗𝚓𝚘𝚢 𝚒𝚝!"
+    "Stay curious, keep learning!",
+    "Dream big, work hard!",
+    "The best is yet to come.",
+    "Keep it real, always.",
+    "Life is a journey, enjoy it!"
 ];
 
-// Function to get Kenya time
-function getKenyaTime() {
+// Function to get Tanzania time
+function getTanzaniaTime() {
     const options = {
-        timeZone: 'Africa/Nairobi',
+        timeZone: 'Africa/Dar_es_Salaam',
         hour12: true,
         hour: 'numeric',
         minute: 'numeric',
@@ -67,25 +67,25 @@ function getKenyaTime() {
     };
     
     const now = new Date();
-    const kenyaTime = now.toLocaleString('en-US', options);
-    return kenyaTime;
+    const tzTime = now.toLocaleString('en-US', options);
+    return tzTime;
 }
 
 cmd({
     pattern: 'autobio',
     alias: ['autoabout'],
-    desc: 'Toggle automatic bio updates with random quotes and Kenya time',
+    desc: 'Toggle automatic bio updates with random quotes and Tanzania time',
     category: 'misc',
     filename: __filename,
     usage: `${config.PREFIX}autobio [on/off] [text]`
 }, async (conn, mek, m, { args, isOwner, from, sender }) => {
     try {
-        const ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃";
-        const formattedOwnerNumber = "255789661031";
+        const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
+        const formattedOwnerNumber = "255628378557";
         
         if (!isOwner) {
             return await conn.sendMessage(from, { 
-                text: "🚫 *𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚒𝚜 𝚘𝚗𝚕𝚢 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎 𝚝𝚘 𝚝𝚑𝚎 𝚋𝚘𝚝 𝚘𝚠𝚗𝚎𝚛.*\n\n> © Powered by Sila Tech", 
+                text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ 🚫 *This command is only available to the bot owner.*\n┃\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
                 contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
             }, { quoted: fkontak });
         }
@@ -96,7 +96,7 @@ cmd({
         if (action === 'on') {
             if (config.AUTO_BIO === "true") {
                 return await conn.sendMessage(from, { 
-                    text: "ℹ️ *𝙰𝚞𝚝𝚘-𝙱𝚒𝚘 𝚒𝚜 𝚊𝚕𝚛𝚎𝚊𝚍𝚢 𝚎𝚗𝚊𝚋𝚕𝚎𝚍*", 
+                    text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ℹ️ *Auto-Bio is already enabled*\n┃\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
                     contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
                 }, { quoted: fkontak });
             }
@@ -107,14 +107,14 @@ cmd({
             startAutoBio(conn, customBio);
             
             return await conn.sendMessage(from, { 
-                text: `✅ *𝙰𝚞𝚝𝚘-𝙱𝚒𝚘 𝙴𝚗𝚊𝚋𝚕𝚎𝚍*\n\n𝚃𝚎𝚡𝚝: "${customBio}"\n\n> © Powered by Sila Tech`, 
+                text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ✅ *Auto-Bio Enabled*\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ Text: "${customBio}"\n┃\n┃▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
                 contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
             }, { quoted: fkontak });
 
         } else if (action === 'off') {
             if (config.AUTO_BIO !== "true") {
                 return await conn.sendMessage(from, { 
-                    text: "ℹ️ *𝙰𝚞𝚝𝚘-𝙱𝚒𝚘 𝚒𝚜 𝚊𝚕𝚛𝚎𝚊𝚍𝚢 𝚍𝚒𝚜𝚊𝚋𝚕𝚎𝚍*", 
+                    text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ℹ️ *Auto-Bio is already disabled*\n┃\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
                     contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
                 }, { quoted: fkontak });
             }
@@ -123,38 +123,23 @@ cmd({
             stopAutoBio();
             
             return await conn.sendMessage(from, { 
-                text: "✅ *𝙰𝚞𝚝𝚘-𝙱𝚒𝚘 𝙳𝚒𝚜𝚊𝚋𝚕𝚎𝚍*\n\n> © Powered by Sila Tech", 
+                text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ✅ *Auto-Bio Disabled*\n┃\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
                 contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
             }, { quoted: fkontak });
 
         } else {
-            const currentStatus = config.AUTO_BIO === "true" ? "𝙴𝚗𝚊𝚋𝚕𝚎𝚍 ✅" : "𝙳𝚒𝚜𝚊𝚋𝚕𝚎𝚍 ❌";
+            const currentStatus = config.AUTO_BIO === "true" ? "Enabled ✅" : "Disabled ❌";
             
             return await conn.sendMessage(from, { 
-                text: `╭━━〔 🤖 *𝙰𝚄𝚃𝙾-𝙱𝙸𝙾* 〕━━┈⊷
-┃
-┃ 📜 *𝚄𝚜𝚊𝚐𝚎:*
-┃ ➸ .autobio on [𝚝𝚎𝚡𝚝] - 𝙴𝚗𝚊𝚋𝚕𝚎
-┃ ➸ .autobio off - 𝙳𝚒𝚜𝚊𝚋𝚕𝚎
-┃
-┃ 🔖 *𝙿𝚕𝚊𝚌𝚎𝚑𝚘𝚕𝚍𝚎𝚛𝚜:*
-┃ ➸ {quote} - 𝚁𝚊𝚗𝚍𝚘𝚖 𝚚𝚞𝚘𝚝𝚎
-┃ ➸ {time} - 𝙺𝚎𝚗𝚢𝚊 𝚝𝚒𝚖𝚎
-┃
-┃ 💡 *𝚂𝚝𝚊𝚝𝚞𝚜:* ${currentStatus}
-┃ 📝 *𝚃𝚎𝚡𝚝:* "${config.AUTO_BIO_TEXT || defaultBio}"
-┃ 🕒 *𝙺𝚎𝚗𝚢𝚊 𝚃𝚒𝚖𝚎:* ${getKenyaTime()}
-┃
-╰──────────────┈⊷
-> © Powered by Sila Tech`, 
+                text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ 🤖 *AUTO-BIO*\n┃▔▔▔▔▔▔▔▔▔▔▔▔▔▔\n┃\n┃ 📜 *Usage:*\n┃ ➸ .autobio on [text] - Enable\n┃ ➸ .autobio off - Disable\n┃\n┃ 🔖 *Placeholders:*\n┃ ➸ {quote} - Random quote\n┃ ➸ {time} - Tanzania time\n┃\n┃ 💡 *Status:* ${currentStatus}\n┃ 📝 *Text:* "${config.AUTO_BIO_TEXT || defaultBio}"\n┃ 🕒 *Tanzania Time:* ${getTanzaniaTime()}\n┃\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
                 contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
             }, { quoted: fkontak });
         }
     } catch (error) {
         console.error('❌ Auto-bio error:', error.message);
         await conn.sendMessage(from, { 
-            text: "❌ 𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚞𝚙𝚍𝚊𝚝𝚎 𝚊𝚞𝚝𝚘-𝚋𝚒𝚘 𝚜𝚎𝚝𝚝𝚒𝚗𝚐𝚜", 
-            contextInfo: getContextInfo({ sender: sender }, "𝐒𝐈𝐋𝐀 𝐌𝐃", "255789661031")
+            text: `╭┄┄┄🌸🌹 *𝐓𝐘𝐑𝐄𝐗 𝐌𝐃* 🌹🌸┄┄┄⊷\n┃\n┃ ❌ Failed to update auto-bio settings\n┃\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐓𝐲𝐫𝐞𝐱 𝐓𝐞𝐜𝐡`, 
+            contextInfo: getContextInfo({ sender: sender }, "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃", "255628378557")
         }, { quoted: fkontak });
     }
 });
@@ -179,10 +164,10 @@ async function startAutoBio(conn, bioText) {
 
     try {
         const quote = await fetchQuote();
-        const kenyaTime = getKenyaTime();
+        const tzTime = getTanzaniaTime();
         const formattedBio = bioText
             .replace('{quote}', quote)
-            .replace('{time}', kenyaTime);
+            .replace('{time}', tzTime);
         await conn.updateProfileStatus(formattedBio);
     } catch (error) {
         console.error('❌ Initial bio update error:', error.message);
@@ -191,20 +176,20 @@ async function startAutoBio(conn, bioText) {
     bioInterval = setInterval(async () => {
         try {
             const quote = await fetchQuote();
-            const kenyaTime = getKenyaTime();
+            const tzTime = getTanzaniaTime();
             const formattedBio = bioText
                 .replace('{quote}', quote)
-                .replace('{time}', kenyaTime);
+                .replace('{time}', tzTime);
             await conn.updateProfileStatus(formattedBio);
         } catch (error) {
             console.error('❌ Bio update error:', error.message);
             setTimeout(async () => {
                 try {
                     const quote = await fetchQuote();
-                    const kenyaTime = getKenyaTime();
+                    const tzTime = getTanzaniaTime();
                     const formattedBio = bioText
                         .replace('{quote}', quote)
-                        .replace('{time}', kenyaTime);
+                        .replace('{time}', tzTime);
                     await conn.updateProfileStatus(formattedBio);
                 } catch (retryError) {
                     console.error('❌ Bio retry error:', retryError.message);
