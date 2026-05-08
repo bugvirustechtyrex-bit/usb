@@ -1,37 +1,24 @@
-const { cmd } = require("../command");
+ const { cmd } = require("../command");
 const { fetchEmix } = require("../lib/emix-utils");
 const { getBuffer } = require("../lib/functions");
 const { Sticker, StickerTypes } = require("wa-sticker-formatter");
 
-// FakevCard sawa na zilizopita
-const fkontak = {
-    "key": {
-        "participant": '0@s.whatsapp.net',
-        "remoteJid": '0@s.whatsapp.net',
-        "fromMe": false,
-        "id": "Halo"
-    },
-    "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
-    }
-};
-
-const getContextInfo = (m, ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃", formattedOwnerNumber = "255789661031") => {
+const getContextInfo = (m, ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃", formattedOwnerNumber = "255628378557") => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         },
         externalAdReply: {
-            title: `👑 𝙱𝙾𝚃 𝙾𝚆𝙽𝙴𝚁: ${ownerName}`,
-            body: `📞 wa.me/${formattedOwnerNumber}`,
+            title: `👑 BOT OWNER: ${ownerName}`,
+            body: `wa.me/${formattedOwnerNumber}`,
             mediaType: 1,
             previewType: 0,
-            thumbnailUrl: 'https://files.catbox.moe/98k75b.jpeg',
+            thumbnailUrl: 'https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg',
             sourceUrl: `https://wa.me/${formattedOwnerNumber}`,
             renderLargerThumbnail: false,
         }
@@ -47,38 +34,29 @@ cmd({
     filename: __filename,
 }, async (conn, mek, m, { args, q, reply, from, sender }) => {
     try {
-        const ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃";
-        const formattedOwnerNumber = "255789661031";
+        const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
+        const formattedOwnerNumber = "255628378557";
         
         if (!q.includes(",")) {
-            return await conn.sendMessage(from, { 
-                text: "❌ *𝚄𝚜𝚊𝚐𝚎:* .emix 😂,🙂\n_𝚂𝚎𝚗𝚍 𝚝𝚠𝚘 𝚎𝚖𝚘𝚓𝚒𝚜 𝚜𝚎𝚙𝚊𝚛𝚊𝚝𝚎𝚍 𝚋𝚢 𝚊 𝚌𝚘𝚖𝚖𝚊._\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
-            }, { quoted: fkontak });
+            return reply("Usage: .emix 😂,🙂\nSend two emojis separated by a comma.\n\n> ® Powered by Tyrex Tech");
         }
 
         let [emoji1, emoji2] = q.split(",").map(e => e.trim());
 
         if (!emoji1 || !emoji2) {
-            return await conn.sendMessage(from, { 
-                text: "❌ 𝙿𝚕𝚎𝚊𝚜𝚎 𝚙𝚛𝚘𝚟𝚒𝚍𝚎 𝚝𝚠𝚘 𝚎𝚖𝚘𝚓𝚒𝚜 𝚜𝚎𝚙𝚊𝚛𝚊𝚝𝚎𝚍 𝚋𝚢 𝚊 𝚌𝚘𝚖𝚖𝚊.\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
-            }, { quoted: fkontak });
+            return reply("Please provide two emojis separated by a comma.\n\n> ® Powered by Tyrex Tech");
         }
 
         let imageUrl = await fetchEmix(emoji1, emoji2);
 
         if (!imageUrl) {
-            return await conn.sendMessage(from, { 
-                text: "❌ 𝙲𝚘𝚞𝚕𝚍 𝚗𝚘𝚝 𝚐𝚎𝚗𝚎𝚛𝚊𝚝𝚎 𝚎𝚖𝚘𝚓𝚒 𝚖𝚒𝚡. 𝚃𝚛𝚢 𝚍𝚒𝚏𝚏𝚎𝚛𝚎𝚗𝚝 𝚎𝚖𝚘𝚓𝚒𝚜.\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
-            }, { quoted: fkontak });
+            return reply("Could not generate emoji mix. Try different emojis.\n\n> ® Powered by Tyrex Tech");
         }
 
         let buffer = await getBuffer(imageUrl);
         let sticker = new Sticker(buffer, {
-            pack: "𝙴𝚖𝚘𝚓𝚒 𝙼𝚒𝚡",
-            author: "𝚂𝙸𝙻𝙰 𝙼𝙳",
+            pack: "Emoji Mix",
+            author: "TYREX MD",
             type: StickerTypes.FULL,
             categories: ["🤩", "🎉"],
             quality: 75,
@@ -90,9 +68,6 @@ cmd({
 
     } catch (e) {
         console.error("Error in .emix command:", e.message);
-        await conn.sendMessage(mek.chat, { 
-            text: `❌ 𝙲𝚘𝚞𝚕𝚍 𝚗𝚘𝚝 𝚐𝚎𝚗𝚎𝚛𝚊𝚝𝚎 𝚎𝚖𝚘𝚓𝚒 𝚖𝚒𝚡: ${e.message}\n\n> © Powered by Sila Tech`, 
-            contextInfo: getContextInfo({ sender: sender }, "𝐒𝐈𝐋𝐀 𝐌𝐃", "255789661031")
-        }, { quoted: fkontak });
+        reply(`Could not generate emoji mix: ${e.message}\n\n> ® Powered by Tyrex Tech`);
     }
 });
