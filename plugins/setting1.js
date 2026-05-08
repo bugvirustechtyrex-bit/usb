@@ -1,21 +1,16 @@
-const { cmd } = require('../command');
+ const { cmd } = require('../command');
 const fs = require('fs');
 const path = require('path');
 
-// Path za settings files
 const SETTINGS_DIR = path.join(__dirname, '../data');
 const IGNORE_LIST_FILE = path.join(SETTINGS_DIR, 'ignorelist.json');
 const COUNTRY_CODES_FILE = path.join(SETTINGS_DIR, 'countrycodes.json');
 const AUTO_BLOCK_FILE = path.join(SETTINGS_DIR, 'autoblock.json');
 
-// Hakikisha folder ipo
 if (!fs.existsSync(SETTINGS_DIR)) {
     fs.mkdirSync(SETTINGS_DIR, { recursive: true });
 }
 
-// ============ FUNCTIONS ZA KUSOMA NA KUANDIKA DATA ============
-
-// Function ya kusoma ignore list
 function readIgnoreList() {
     try {
         if (fs.existsSync(IGNORE_LIST_FILE)) {
@@ -29,7 +24,6 @@ function readIgnoreList() {
     }
 }
 
-// Function ya kuandika ignore list
 function writeIgnoreList(data) {
     try {
         fs.writeFileSync(IGNORE_LIST_FILE, JSON.stringify(data, null, 2));
@@ -40,7 +34,6 @@ function writeIgnoreList(data) {
     }
 }
 
-// Function ya kusoma country codes
 function readCountryCodes() {
     try {
         if (fs.existsSync(COUNTRY_CODES_FILE)) {
@@ -54,7 +47,6 @@ function readCountryCodes() {
     }
 }
 
-// Function ya kuandika country codes
 function writeCountryCodes(data) {
     try {
         fs.writeFileSync(COUNTRY_CODES_FILE, JSON.stringify(data, null, 2));
@@ -65,7 +57,6 @@ function writeCountryCodes(data) {
     }
 }
 
-// Function ya kusoma auto block settings
 function readAutoBlock() {
     try {
         if (fs.existsSync(AUTO_BLOCK_FILE)) {
@@ -79,7 +70,6 @@ function readAutoBlock() {
     }
 }
 
-// Function ya kuandika auto block settings
 function writeAutoBlock(data) {
     try {
         fs.writeFileSync(AUTO_BLOCK_FILE, JSON.stringify(data, null, 2));
@@ -90,27 +80,14 @@ function writeAutoBlock(data) {
     }
 }
 
-// FakevCard
-const fkontak = {
-    "key": {
-        "participant": '0@s.whatsapp.net',
-        "remoteJid": '0@s.whatsapp.net',
-        "fromMe": false,
-        "id": "Halo"
-    },
-    "message": {
-        "conversation": "𝐒𝐈𝐋𝐀 𝐌𝐃"
-    }
-};
-
 const getContextInfo = (m) => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         },
     };
@@ -125,108 +102,69 @@ cmd({
     category: "settings",
     filename: __filename
 },
-async(conn, mek, m, {from, l, isGroup, sender, isOwner, args, quoted, mentionedJid}) => {
+async(conn, mek, m, {from, l, isGroup, sender, isOwner, args, quoted, mentionedJid, reply}) => {
 try{
-    if (!isOwner) return await conn.sendMessage(from, {
-        text: `❌ This command is only for bot owner`,
-        contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    if (!isOwner) return reply("This command is only for bot owner\n\n> ® Powered by Tyrex Tech");
     
     if (!args[0]) {
         return await conn.sendMessage(from, {
-            text: `┏━❑ ADD IGNORE LIST ━━━━━━━━━
-┃ 📝 *Usage:*
-┃ 
-┃ • Add user: .addignorelist @user
-┃ • Add user: .addignorelist 2557xxxxxx
-┃ • Add group: .addignorelist groupjid
-┃ • Reply to user: .addignorelist
-┃ 
-┗━━━━━━━━━━━━━━━━━━━━`,
+            text: `╭┄┄┄🌸🌹 *ADD IGNORE LIST* 🌹🌸┄┄┄⊷\n┃ 📝 *Usage:*\n┃\n┃ • Add user: .addignorelist @user\n┃ • Add user: .addignorelist 2557xxxxxx\n┃ • Add group: .addignorelist groupjid\n┃ • Reply to user: .addignorelist\n┃\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`,
             contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
     }
     
     let target = '';
     let type = '';
     
-    // Check if replying to a message
     if (m.quoted && m.quoted.sender) {
         target = m.quoted.sender;
         type = 'user';
-    }
-    // Check if mentioning someone
-    else if (mentionedJid && mentionedJid.length > 0) {
+    } else if (mentionedJid && mentionedJid.length > 0) {
         target = mentionedJid[0];
         type = 'user';
-    }
-    // Check if it's a group JID
-    else if (args[0].includes('@g.us')) {
+    } else if (args[0].includes('@g.us')) {
         target = args[0];
         type = 'group';
-    }
-    // Check if it's a phone number
-    else {
+    } else {
         let number = args[0].replace(/[^0-9]/g, '');
         if (number.length >= 10) {
             target = number + '@s.whatsapp.net';
             type = 'user';
         } else {
-            return await conn.sendMessage(from, {
-                text: `❌ Invalid number format`,
-                contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
+            return reply("Invalid number format\n\n> ® Powered by Tyrex Tech");
         }
     }
     
-    // Read current ignore list
     let ignoreList = readIgnoreList();
     
-    // Add to appropriate list
     if (type === 'user') {
         if (!ignoreList.users.includes(target)) {
             ignoreList.users.push(target);
             await conn.sendMessage(from, {
-                text: `┏━❑ IGNORE LIST UPDATED ━━━━━━━━━
-┃ ✅ User added to ignore list
-┃ 👤 @${target.split('@')[0]}
-┗━━━━━━━━━━━━━━━━━━━━`,
+                text: `╭┄┄┄🌸🌹 *IGNORE LIST UPDATED* 🌹🌸┄┄┄⊷\n┃ ✅ User added to ignore list\n┃ 👤 @${target.split('@')[0]}\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`,
                 mentions: [target],
                 contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
+            }, { quoted: mek });
         } else {
-            return await conn.sendMessage(from, {
-                text: `❌ User already in ignore list`,
-                contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
+            return reply("User already in ignore list\n\n> ® Powered by Tyrex Tech");
         }
     } else if (type === 'group') {
         if (!ignoreList.groups.includes(target)) {
             ignoreList.groups.push(target);
             await conn.sendMessage(from, {
-                text: `┏━❑ IGNORE LIST UPDATED ━━━━━━━━━
-┃ ✅ Group added to ignore list
-┃ 🆔 ${target}
-┗━━━━━━━━━━━━━━━━━━━━`,
+                text: `╭┄┄┄🌸🌹 *IGNORE LIST UPDATED* 🌹🌸┄┄┄⊷\n┃ ✅ Group added to ignore list\n┃ 🆔 ${target}\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`,
                 contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
+            }, { quoted: mek });
         } else {
-            return await conn.sendMessage(from, {
-                text: `❌ Group already in ignore list`,
-                contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
+            return reply("Group already in ignore list\n\n> ® Powered by Tyrex Tech");
         }
     }
     
-    // Save to file
     writeIgnoreList(ignoreList);
 
 } catch (e) {
     console.log('ADDIGNORELIST ERROR:', e);
-    await conn.sendMessage(from, {
-        text: `❌ Error: ${e.message}`,
-        contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    reply(`Error: ${e.message}\n\n> ® Powered by Tyrex Tech`);
     l(e);
 }
 });
@@ -240,23 +178,12 @@ cmd({
     category: "settings",
     filename: __filename
 },
-async(conn, mek, m, {from, l, isGroup, sender, isOwner, args, quoted, mentionedJid}) => {
+async(conn, mek, m, {from, l, isGroup, sender, isOwner, args, quoted, mentionedJid, reply}) => {
 try{
     if (!isOwner) return;
     
     if (!args[0] && !m.quoted) {
-        return await conn.sendMessage(from, {
-            text: `┏━❑ REMOVE IGNORE LIST ━━━━━━━━━
-┃ 📝 *Usage:*
-┃ 
-┃ • Remove user: .delignorelist @user
-┃ • Remove user: .delignorelist 2557xxxxxx
-┃ • Remove group: .delignorelist groupjid
-┃ • Reply to user: .delignorelist
-┃ 
-┗━━━━━━━━━━━━━━━━━━━━`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        return reply("Usage: .delignorelist @user or .delignorelist 2557xxxxxx\n\n> ® Powered by Tyrex Tech");
     }
     
     let target = '';
@@ -290,10 +217,10 @@ try{
             ignoreList.users.splice(index, 1);
             removed = true;
             await conn.sendMessage(from, {
-                text: `✅ User @${target.split('@')[0]} removed from ignore list`,
+                text: `✅ User @${target.split('@')[0]} removed from ignore list\n\n> ® Powered by Tyrex Tech`,
                 mentions: [target],
                 contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
+            }, { quoted: mek });
         }
     } else if (type === 'group') {
         const index = ignoreList.groups.indexOf(target);
@@ -301,17 +228,14 @@ try{
             ignoreList.groups.splice(index, 1);
             removed = true;
             await conn.sendMessage(from, {
-                text: `✅ Group removed from ignore list`,
+                text: `✅ Group removed from ignore list\n\n> ® Powered by Tyrex Tech`,
                 contextInfo: getContextInfo({ sender: sender })
-            }, { quoted: fkontak });
+            }, { quoted: mek });
         }
     }
     
     if (!removed) {
-        return await conn.sendMessage(from, {
-            text: `❌ Not found in ignore list`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        return reply("Not found in ignore list\n\n> ® Powered by Tyrex Tech");
     }
     
     writeIgnoreList(ignoreList);
@@ -328,7 +252,7 @@ cmd({
     category: "settings",
     filename: __filename
 },
-async(conn, mek, m, {from, l, sender, isOwner, args}) => {
+async(conn, mek, m, {from, l, sender, isOwner, args, reply}) => {
 try{
     if (!isOwner) return;
     
@@ -341,35 +265,19 @@ try{
             : 'None';
         
         return await conn.sendMessage(from, {
-            text: `┏━❑ AUTO BLOCK SETTINGS ━━━━━━━━━
-┃ 🔒 *Status:* ${status}
-┃ 🌍 *Countries:* ${countries}
-┃ 
-┃ *Commands:*
-┃ • .autoblock on - Enable
-┃ • .autoblock off - Disable
-┃ • .addcountrycode 255 - Add country
-┃ • .delcountrycode 255 - Remove country
-┃ • .listcountrycode - List all
-┗━━━━━━━━━━━━━━━━━━━━`,
+            text: `╭┄┄┄🌸🌹 *AUTO BLOCK SETTINGS* 🌹🌸┄┄┄⊷\n┃ 🔒 *Status:* ${status}\n┃ 🌍 *Countries:* ${countries}\n┃\n┃ *Commands:*\n┃ • .autoblock on - Enable\n┃ • .autoblock off - Disable\n┃ • .addcountrycode 255 - Add country\n┃ • .delcountrycode 255 - Remove country\n┃ • .listcountrycode - List all\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`,
             contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
     }
     
     if (args[0] === 'on' || args[0] === 'enable') {
         autoBlock.enabled = true;
         writeAutoBlock(autoBlock);
-        await conn.sendMessage(from, {
-            text: `✅ Auto block ENABLED`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        reply("✅ Auto block ENABLED\n\n> ® Powered by Tyrex Tech");
     } else if (args[0] === 'off' || args[0] === 'disable') {
         autoBlock.enabled = false;
         writeAutoBlock(autoBlock);
-        await conn.sendMessage(from, {
-            text: `✅ Auto block DISABLED`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        reply("✅ Auto block DISABLED\n\n> ® Powered by Tyrex Tech");
     }
 
 } catch (e) { console.log(e); }
@@ -384,24 +292,18 @@ cmd({
     category: "settings",
     filename: __filename
 },
-async(conn, mek, m, {from, l, sender, isOwner, args}) => {
+async(conn, mek, m, {from, l, sender, isOwner, args, reply}) => {
 try{
     if (!isOwner) return;
     
     if (!args[0]) {
-        return await conn.sendMessage(from, {
-            text: `❌ Please provide country code\n\nExample: .addcountrycode 255`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        return reply("Please provide country code\n\nExample: .addcountrycode 255\n\n> ® Powered by Tyrex Tech");
     }
     
     let countryCode = args[0].replace(/[^0-9]/g, '');
     
     if (countryCode.length < 1 || countryCode.length > 4) {
-        return await conn.sendMessage(from, {
-            text: `❌ Invalid country code`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        return reply("Invalid country code\n\n> ® Powered by Tyrex Tech");
     }
     
     let autoBlock = readAutoBlock();
@@ -411,17 +313,11 @@ try{
         writeAutoBlock(autoBlock);
         
         await conn.sendMessage(from, {
-            text: `┏━❑ COUNTRY CODE ADDED ━━━━━━━━━
-┃ ✅ Added: +${countryCode}
-┃ 📋 Total: ${autoBlock.countryCodes.length} countries
-┗━━━━━━━━━━━━━━━━━━━━`,
+            text: `╭┄┄┄🌸🌹 *COUNTRY CODE ADDED* 🌹🌸┄┄┄⊷\n┃ ✅ Added: +${countryCode}\n┃ 📋 Total: ${autoBlock.countryCodes.length} countries\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`,
             contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
     } else {
-        await conn.sendMessage(from, {
-            text: `❌ Country code +${countryCode} already exists`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        reply(`Country code +${countryCode} already exists\n\n> ® Powered by Tyrex Tech`);
     }
 
 } catch (e) { console.log(e); }
@@ -436,15 +332,12 @@ cmd({
     category: "settings",
     filename: __filename
 },
-async(conn, mek, m, {from, l, sender, isOwner, args}) => {
+async(conn, mek, m, {from, l, sender, isOwner, args, reply}) => {
 try{
     if (!isOwner) return;
     
     if (!args[0]) {
-        return await conn.sendMessage(from, {
-            text: `❌ Please provide country code\n\nExample: .delcountrycode 255`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        return reply("Please provide country code\n\nExample: .delcountrycode 255\n\n> ® Powered by Tyrex Tech");
     }
     
     let countryCode = args[0].replace(/[^0-9]/g, '');
@@ -457,17 +350,11 @@ try{
         writeAutoBlock(autoBlock);
         
         await conn.sendMessage(from, {
-            text: `┏━❑ COUNTRY CODE REMOVED ━━━━━━━━━
-┃ ✅ Removed: +${countryCode}
-┃ 📋 Remaining: ${autoBlock.countryCodes.length} countries
-┗━━━━━━━━━━━━━━━━━━━━`,
+            text: `╭┄┄┄🌸🌹 *COUNTRY CODE REMOVED* 🌹🌸┄┄┄⊷\n┃ ✅ Removed: +${countryCode}\n┃ 📋 Remaining: ${autoBlock.countryCodes.length} countries\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`,
             contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
     } else {
-        await conn.sendMessage(from, {
-            text: `❌ Country code +${countryCode} not found`,
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        reply(`Country code +${countryCode} not found\n\n> ® Powered by Tyrex Tech`);
     }
 
 } catch (e) { console.log(e); }
@@ -489,7 +376,7 @@ try{
     let autoBlock = readAutoBlock();
     let ignoreList = readIgnoreList();
     
-    let countryList = "┏━❑ AUTO BLOCK COUNTRIES ━━━━━━━━━\n┃\n";
+    let countryList = "╭┄┄┄🌸🌹 *AUTO BLOCK COUNTRIES* 🌹🌸┄┄┄⊷\n┃\n";
     
     if (autoBlock.countryCodes.length > 0) {
         autoBlock.countryCodes.sort().forEach((code, i) => {
@@ -504,12 +391,12 @@ try{
     countryList += `┃\n┃━━━━━━━━━━━━━━━━━━━━\n┃\n`;
     countryList += `┃ 🚫 Ignored Users: ${ignoreList.users.length}\n`;
     countryList += `┃ 🚫 Ignored Groups: ${ignoreList.groups.length}\n`;
-    countryList += `┗━━━━━━━━━━━━━━━━━━━━`;
+    countryList += `╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`;
     
     await conn.sendMessage(from, {
         text: countryList,
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 
 } catch (e) { console.log(e); }
 });
@@ -529,7 +416,7 @@ try{
     
     let ignoreList = readIgnoreList();
     
-    let ignoreText = "┏━❑ IGNORE LIST ━━━━━━━━━\n┃\n";
+    let ignoreText = "╭┄┄┄🌸🌹 *IGNORE LIST* 🌹🌸┄┄┄⊷\n┃\n";
     
     ignoreText += "┃ 👤 *IGNORED USERS:*\n";
     if (ignoreList.users.length > 0) {
@@ -550,30 +437,25 @@ try{
     }
     
     ignoreText += `┃\n┃ Total: ${ignoreList.users.length + ignoreList.groups.length} items\n`;
-    ignoreText += `┗━━━━━━━━━━━━━━━━━━━━`;
+    ignoreText += `╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`;
     
     await conn.sendMessage(from, {
         text: ignoreText,
         mentions: ignoreList.users,
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 
 } catch (e) { console.log(e); }
 });
-
-// ============ AUTO BLOCK MIDDLEWARE ============
-// Hii inaangalia na kublock automatically watu wenye country codes zilizopo kwenye list
 
 async function checkAndBlockAuto(conn, jid, userJid) {
     try {
         let autoBlock = readAutoBlock();
         if (!autoBlock.enabled || autoBlock.countryCodes.length === 0) return false;
         
-        // Extract country code from user JID
         const number = userJid.split('@')[0];
         for (let code of autoBlock.countryCodes) {
             if (number.startsWith(code)) {
-                // Block the user
                 await conn.updateBlockStatus(userJid, 'block');
                 console.log(`Auto-blocked: ${userJid} (Country code: +${code})`);
                 return true;
@@ -585,9 +467,6 @@ async function checkAndBlockAuto(conn, jid, userJid) {
         return false;
     }
 }
-
-// ============ IGNORE LIST MIDDLEWARE ============
-// Hii inaangalia kama user/group ipo kwenye ignore list
 
 async function isIgnored(jid, isGroup) {
     try {
@@ -604,7 +483,6 @@ async function isIgnored(jid, isGroup) {
     }
 }
 
-// Export functions for use in other files
 module.exports = {
     checkAndBlockAuto,
     isIgnored,
