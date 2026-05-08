@@ -49,7 +49,7 @@ const fkontak = {
         "id": "Halo"
     },
     "message": {
-        "conversation": "𝚂𝙸𝙻𝙰 𝚃𝚁𝙰𝙳𝙴"
+        "conversation": "𝐓𝐘𝐑𝐄𝐗"
     }
 };
 
@@ -61,7 +61,7 @@ const getContextInfo = (m, sender) => {
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
             newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterName: '© 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         }
     };
@@ -126,7 +126,7 @@ cmd({
 ║ ▸ .interest 100000 5 ║
 ╚══════════════════════╝
 
-> © Sila MD | *Trade & Business Tools*`;
+> © Tyrex MD | *Trade & Business Tools*`;
 
         await conn.sendMessage(from, {
             image: { url: 'https://files.catbox.moe/36vahk.png' },
