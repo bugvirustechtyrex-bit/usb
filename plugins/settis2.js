@@ -24,7 +24,7 @@ const DEFAULT_SETTINGS = {
     stickerPackName: 'Sila Stickers',
     
     // Watermark settings
-    watermark: '© 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃,
+    watermark: '© 𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
     
     // Timezone settings
     timezone: 'Africa/Dar_es_Salaam',
