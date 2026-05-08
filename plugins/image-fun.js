@@ -1,21 +1,8 @@
-const config = require('../config')
+ const config = require('../config')
 const axios = require('axios');
 const { cmd, commands } = require('../command')
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson} = require('../lib/functions')
 const fs = require('fs');
-
-// FakevCard sawa na zilizopita
-const fkontak = {
-    "key": {
-        "participant": '0@s.whatsapp.net',
-        "remoteJid": '0@s.whatsapp.net',
-        "fromMe": false,
-        "id": "Halo"
-    },
-    "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
-    }
-};
 
 const getContextInfo = (m) => {
     return {
@@ -23,16 +10,12 @@ const getContextInfo = (m) => {
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         }
     };
 };
-
-var imgmsg = "*Give me a anime name !*"
-var descgs = "It gives details of given anime name."
-var cants = "I cant find this anime."
 
 //====================================================================================
 cmd({
@@ -47,21 +30,16 @@ cmd({
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
 let res = await axios.get('https://api.lolicon.app/setu/v2?num=1&r18=0&tag=lolicon')
-let wm = `😎 𝚁𝚊𝚗𝚍𝚘𝚖 𝙻𝚘𝚕𝚒 𝙸𝚖𝚊𝚐𝚎
-
-> © Powered by Sila Tech`
+let wm = `😎 Random Loli Image\n\n> ® Powered by Tyrex Tech`
 
 await conn.sendMessage(from, { 
     image: { url: res.data.data[0].urls.original }, 
     caption: wm,
     contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+}, { quoted: mek })
 
 } catch (e) {
-await conn.sendMessage(from, { 
-    text: `❌ 𝙸 𝚌𝚊𝚗𝚝 𝚏𝚒𝚗𝚍 𝚝𝚑𝚒𝚜 𝚊𝚗𝚒𝚖𝚎.\n\n> © Powered by Sila Tech`, 
-    contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+reply("I cant find this anime.\n\n> ® Powered by Tyrex Tech")
 console.log(e)
 }
 })
@@ -79,21 +57,16 @@ cmd({
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
 let res = await axios.get('https://api.waifu.pics/sfw/waifu')
-let wm = `🩵 𝚁𝚊𝚗𝚍𝚘𝚖 𝚆𝚊𝚒𝚏𝚞 𝙸𝚖𝚊𝚐𝚎
-
-> © Powered by Sila Tech`
+let wm = `🩵 Random Waifu Image\n\n> ® Powered by Tyrex Tech`
 
 await conn.sendMessage(from, { 
     image: { url: res.data.url }, 
     caption: wm,
     contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+}, { quoted: mek })
 
 } catch (e) {
-await conn.sendMessage(from, { 
-    text: `❌ 𝙸 𝚌𝚊𝚗𝚝 𝚏𝚒𝚗𝚍 𝚝𝚑𝚒𝚜 𝚊𝚗𝚒𝚖𝚎.\n\n> © Powered by Sila Tech`, 
-    contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+reply("I cant find this anime.\n\n> ® Powered by Tyrex Tech")
 console.log(e)
 }
 })
@@ -111,21 +84,16 @@ cmd({
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
 let res = await axios.get('https://api.waifu.pics/sfw/neko')
-let wm = `🩷 𝚁𝚊𝚗𝚍𝚘𝚖 𝙽𝚎𝚔𝚘 𝙸𝚖𝚊𝚐𝚎
-
-> © Powered by Sila Tech`
+let wm = `🩷 Random Neko Image\n\n> ® Powered by Tyrex Tech`
 
 await conn.sendMessage(from, { 
     image: { url: res.data.url  }, 
     caption: wm,
     contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+}, { quoted: mek })
 
 } catch (e) {
-await conn.sendMessage(from, { 
-    text: `❌ 𝙸 𝚌𝚊𝚗𝚝 𝚏𝚒𝚗𝚍 𝚝𝚑𝚒𝚜 𝚊𝚗𝚒𝚖𝚎.\n\n> © Powered by Sila Tech`, 
-    contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+reply("I cant find this anime.\n\n> ® Powered by Tyrex Tech")
 console.log(e)
 }
 })
@@ -143,21 +111,16 @@ cmd({
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
 let res = await axios.get('https://api.waifu.pics/sfw/megumin')
-let wm = `❤️‍🔥 𝚁𝚊𝚗𝚍𝚘𝚖 𝙼𝚎𝚐𝚞𝚖𝚒𝚗 𝙸𝚖𝚊𝚐𝚎
-
-> © Powered by Sila Tech`
+let wm = `❤️‍🔥 Random Megumin Image\n\n> ® Powered by Tyrex Tech`
 
 await conn.sendMessage(from, { 
     image: { url: res.data.url }, 
     caption: wm,
     contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+}, { quoted: mek })
 
 } catch (e) {
-await conn.sendMessage(from, { 
-    text: `❌ 𝙸 𝚌𝚊𝚗𝚝 𝚏𝚒𝚗𝚍 𝚝𝚑𝚒𝚜 𝚊𝚗𝚒𝚖𝚎.\n\n> © Powered by Sila Tech`, 
-    contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+reply("I cant find this anime.\n\n> ® Powered by Tyrex Tech")
 console.log(e)
 }
 })
@@ -175,21 +138,16 @@ cmd({
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
 let res = await axios.get('https://api.waifu.im/search/?included_tags=maid')
-let wm = `😎 𝚁𝚊𝚗𝚍𝚘𝚖 𝙼𝚊𝚒𝚍 𝙸𝚖𝚊𝚐𝚎
-
-> © Powered by Sila Tech`
+let wm = `😎 Random Maid Image\n\n> ® Powered by Tyrex Tech`
 
 await conn.sendMessage(from, { 
     image: { url: res.data.images[0].url  }, 
     caption: wm,
     contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+}, { quoted: mek })
 
 } catch (e) {
-await conn.sendMessage(from, { 
-    text: `❌ 𝙸 𝚌𝚊𝚗𝚝 𝚏𝚒𝚗𝚍 𝚝𝚑𝚒𝚜 𝚊𝚗𝚒𝚖𝚎.\n\n> © Powered by Sila Tech`, 
-    contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+reply("I cant find this anime.\n\n> ® Powered by Tyrex Tech")
 console.log(e)
 }
 })
@@ -207,21 +165,16 @@ cmd({
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
 let res = await axios.get('https://api.waifu.pics/sfw/awoo')
-let wm = `😎 𝚁𝚊𝚗𝚍𝚘𝚖 𝙰𝚠𝚘𝚘 𝙸𝚖𝚊𝚐𝚎
-
-> © Powered by Sila Tech`
+let wm = `😎 Random Awoo Image\n\n> ® Powered by Tyrex Tech`
 
 await conn.sendMessage(from, { 
     image: { url: res.data.url }, 
     caption: wm,
     contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+}, { quoted: mek })
 
 } catch (e) {
-await conn.sendMessage(from, { 
-    text: `❌ 𝙸 𝚌𝚊𝚗𝚝 𝚏𝚒𝚗𝚍 𝚝𝚑𝚒𝚜 𝚊𝚗𝚒𝚖𝚎.\n\n> © Powered by Sila Tech`, 
-    contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+reply("I cant find this anime.\n\n> ® Powered by Tyrex Tech")
 console.log(e)
 }
 })
@@ -242,16 +195,13 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 
         await conn.sendMessage(from, { 
             image: { url: data.url }, 
-            caption: '*𝙰𝙽𝙸𝙼𝙴 𝙶𝙸𝚁𝙻 𝙸𝙼𝙰𝙶𝙴* 🥳\n\n> © Powered by Sila Tech',
+            caption: '*ANIME GIRL IMAGE* 🥳\n\n> ® Powered by Tyrex Tech',
             contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
         
     } catch (e) {
         console.log(e);
-        await conn.sendMessage(from, { 
-            text: `❌ 𝙴𝚛𝚛𝚘𝚛 𝙵𝚎𝚝𝚌𝚑𝚒𝚗𝚐 𝙰𝚗𝚒𝚖𝚎 𝙶𝚒𝚛𝚕 𝚒𝚖𝚊𝚐𝚎: ${e.message}\n\n> © Powered by Sila Tech`, 
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        reply(`Error Fetching Anime Girl image: ${e.message}\n\n> ® Powered by Tyrex Tech`);
     }
 });
 
@@ -270,21 +220,15 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 
         await conn.sendMessage(from, { 
             image: { url: data.url }, 
-            caption: '𝙰𝙽𝙸𝙼𝙴 𝙶𝙸𝚁𝙻 𝙸𝙼𝙰𝙶𝙴 👾\n\n> © Powered by Sila Tech',
+            caption: 'ANIME GIRL IMAGE 👾\n\n> ® Powered by Tyrex Tech',
             contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
         
     } catch (e) {
         console.log(e);
-        await conn.sendMessage(from, { 
-            text: `❌ 𝙴𝚛𝚛𝚘𝚛 𝙵𝚎𝚝𝚌𝚑𝚒𝚗𝚐 𝙰𝚗𝚒𝚖𝚎 𝙶𝚒𝚛𝚕 𝚒𝚖𝚊𝚐𝚎: ${e.message}\n\n> © Powered by Sila Tech`, 
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        reply(`Error Fetching Anime Girl image: ${e.message}\n\n> ® Powered by Tyrex Tech`);
     }
 });
-
-// Nimefupisha animegirl2 hadi animegirl5 kwa sababu zinafanana
-// Tafadhali rudia muundo huo kwa zote
 
 //==========anime=====
 cmd({
@@ -296,7 +240,7 @@ cmd({
 },
 async(conn, mek, m,{from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
-let dec = `> 𝚂𝙸𝙻𝙰 𝙼𝙳 𝙰𝙽𝙸𝙼𝙴 𝙸𝙼𝙶𝚂*`
+let dec = `> TYREX MD ANIME IMGS`
 
 const images = [
     'https://telegra.ph/file/b26f27aa5daaada031b90.jpg',
@@ -313,19 +257,15 @@ for (let img of images) {
         image: { url: img },
         caption: dec,
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 }
 
 }catch(e){
 console.log(e)
-await conn.sendMessage(from, { 
-    text: `${e}`, 
-    contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+reply(`${e}`);
 }
 });
 
-// Nimefupisha anime1 hadi anime5 kwa muundo sawa
 cmd({
     pattern: "anime1",
     desc: "Animal image.",
@@ -346,21 +286,16 @@ const images = [
 for (let img of images) {
     await conn.sendMessage(from, {
         image: { url: img },
-        caption: '> © Powered by Sila Tech',
+        caption: '> ® Powered by Tyrex Tech',
         contextInfo: getContextInfo({ sender: sender })
-    }, { quoted: fkontak });
+    }, { quoted: mek });
 }
 
 }catch(e){
 console.log(e)
-await conn.sendMessage(from, { 
-    text: `${e}`, 
-    contextInfo: getContextInfo({ sender: sender })
-}, { quoted: fkontak })
+reply(`${e}`);
 }
 })
-
-// Rudia muundo huo kwa anime2, anime3, anime4, anime5
 
 cmd({
     pattern: "dog",
@@ -377,15 +312,12 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 
         await conn.sendMessage(from, { 
             image: { url: data.message }, 
-            caption: '> © Powered by Sila Tech',
+            caption: '> ® Powered by Tyrex Tech',
             contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        }, { quoted: mek });
         
     } catch (e) {
         console.log(e);
-        await conn.sendMessage(from, { 
-            text: `❌ 𝙴𝚛𝚛𝚘𝚛 𝚏𝚎𝚝𝚌𝚑𝚒𝚗𝚐 𝚍𝚘𝚐 𝚒𝚖𝚊𝚐𝚎: ${e.message}\n\n> © Powered by Sila Tech`, 
-            contextInfo: getContextInfo({ sender: sender })
-        }, { quoted: fkontak });
+        reply(`Error fetching dog image: ${e.message}\n\n> ® Powered by Tyrex Tech`);
     }
 });
