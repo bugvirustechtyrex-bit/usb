@@ -1,35 +1,22 @@
-const { cmd } = require('../command');
+ const { cmd } = require('../command');
 const config = require('../config');
 
-// FakevCard sawa na zilizopita
-const fkontak = {
-    "key": {
-        "participant": '0@s.whatsapp.net',
-        "remoteJid": '0@s.whatsapp.net',
-        "fromMe": false,
-        "id": "Halo"
-    },
-    "message": {
-        "conversation": "𝚂𝙸𝙻𝙰"
-    }
-};
-
-const getContextInfo = (m, ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃", formattedOwnerNumber = "255789661031") => {
+const getContextInfo = (m, ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃", formattedOwnerNumber = "255628378557") => {
     return {
         mentionedJid: [m.sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         },
         externalAdReply: {
-            title: `👑 𝙱𝙾𝚃 𝙾𝚆𝙽𝙴𝚁: ${ownerName}`,
-            body: `📞 wa.me/${formattedOwnerNumber}`,
+            title: `👑 BOT OWNER: ${ownerName}`,
+            body: `wa.me/${formattedOwnerNumber}`,
             mediaType: 1,
             previewType: 0,
-            thumbnailUrl: 'https://files.catbox.moe/98k75b.jpeg',
+            thumbnailUrl: 'https://i.ibb.co/2YRqb2Md/upload-1777244568390-9cc80c1a-jpg.jpg',
             sourceUrl: `https://wa.me/${formattedOwnerNumber}`,
             renderLargerThumbnail: false,
         }
@@ -43,23 +30,17 @@ cmd({
     desc: "Delete quoted message and command message (Owner only)",
     category: "owner",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, isOwner, sender }) => {
+}, async (conn, mek, m, { from, quoted, isOwner, sender, reply }) => {
     try {
-        const ownerName = "𝐒𝐈𝐋𝐀 𝐌𝐃";
-        const formattedOwnerNumber = "255789661031";
+        const ownerName = "𝐓𝐘𝐑𝐄𝐗 𝐌𝐃";
+        const formattedOwnerNumber = "255628378557";
         
         if (!isOwner) {
-            return await conn.sendMessage(from, { 
-                text: "🚫 *𝚃𝚑𝚒𝚜 𝚒𝚜 𝚊𝚗 𝚘𝚠𝚗𝚎𝚛-𝚘𝚗𝚕𝚢 𝚌𝚘𝚖𝚖𝚊𝚗𝚍*\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
-            }, { quoted: fkontak });
+            return reply("This is an owner-only command\n\n> ® Powered by Tyrex Tech");
         }
         
         if (!quoted) {
-            return await conn.sendMessage(from, { 
-                text: "❌ 𝙿𝚕𝚎𝚊𝚜𝚎 𝚛𝚎𝚙𝚕𝚢 𝚝𝚘 𝚝𝚑𝚎 𝚖𝚎𝚜𝚜𝚊𝚐𝚎 𝚢𝚘𝚞 𝚠𝚊𝚗𝚝 𝚝𝚘 𝚍𝚎𝚕𝚎𝚝𝚎\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
-            }, { quoted: fkontak });
+            return reply("Please reply to the message you want to delete\n\n> ® Powered by Tyrex Tech");
         }
 
         let successCount = 0;
@@ -96,7 +77,7 @@ cmd({
             // If quoted message not from bot, edit it
             try {
                 await conn.sendMessage(from, {
-                    text: "🗑️ *𝙼𝚎𝚜𝚜𝚊𝚐𝚎 𝚌𝚕𝚎𝚊𝚛𝚎𝚍 𝚋𝚢 𝚊𝚍𝚖𝚒𝚗*",
+                    text: "🗑️ Message cleared by admin",
                     edit: quoted.key
                 });
                 successCount++;
@@ -108,9 +89,9 @@ cmd({
         // Send temporary feedback
         if (successCount > 0) {
             const feedback = await conn.sendMessage(from, { 
-                text: `🗑️ 𝙲𝚕𝚎𝚊𝚛𝚎𝚍 ${successCount} 𝚖𝚎𝚜𝚜𝚊𝚐𝚎(𝚜)`, 
+                text: `🗑️ Cleared ${successCount} message(s)`, 
                 contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
-            }, { quoted: fkontak });
+            }, { quoted: mek });
             
             setTimeout(async () => {
                 try {
@@ -124,17 +105,11 @@ cmd({
                 } catch (e) {}
             }, 1500);
         } else {
-            await conn.sendMessage(from, { 
-                text: "❌ 𝙽𝚘 𝚖𝚎𝚜𝚜𝚊𝚐𝚎𝚜 𝚌𝚘𝚞𝚕𝚍 𝚋𝚎 𝚌𝚕𝚎𝚊𝚛𝚎𝚍\n\n> © Powered by Sila Tech", 
-                contextInfo: getContextInfo({ sender: sender }, ownerName, formattedOwnerNumber)
-            }, { quoted: fkontak });
+            reply("No messages could be cleared\n\n> ® Powered by Tyrex Tech");
         }
 
     } catch (error) {
         console.error('Delete command error:', error);
-        await conn.sendMessage(from, { 
-            text: "❌ 𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚙𝚛𝚘𝚌𝚎𝚜𝚜 𝚍𝚎𝚕𝚎𝚝𝚎 𝚌𝚘𝚖𝚖𝚊𝚗𝚍\n\n> © Powered by Sila Tech", 
-            contextInfo: getContextInfo({ sender: sender }, "𝐒𝐈𝐋𝐀 𝐌𝐃", "255789661031")
-        }, { quoted: fkontak });
+        reply("Failed to process delete command\n\n> ® Powered by Tyrex Tech");
     }
 });
