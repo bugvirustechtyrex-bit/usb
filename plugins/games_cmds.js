@@ -1,27 +1,13 @@
-const { cmd } = require("../command");
+ const { cmd } = require("../command");
 
-// Fake vCard for quoting
-const fkontak = {
-    "key": {
-        "participant": '0@s.whatsapp.net',
-        "remoteJid": '0@s.whatsapp.net',
-        "fromMe": false,
-        "id": "Halo"
-    },
-    "message": {
-        "conversation": "𝚂𝙸𝙻𝙰 𝙶𝙰𝙼𝙴𝚂"
-    }
-};
-
-// Helper function for context info
 const getContextInfo = (m, sender) => {
     return {
         mentionedJid: [sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363402325089913@newsletter',
-            newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+            newsletterJid: '120363424973782944@newsletter',
+            newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
             serverMessageId: 143,
         }
     };
@@ -40,13 +26,7 @@ const activeGames = {
     memory: new Map(),
     typingRace: new Map(),
     rockPaperScissors: new Map(),
-    truthOrDare: new Map(),
-    wouldYouRather: new Map(),
     wordScramble: new Map(),
-    crossword: new Map(),
-    sudoku: new Map(),
-    chess: new Map(),
-    checkers: new Map(),
     trivia: new Map(),
     hangmanClassic: new Map()
 };
@@ -61,22 +41,21 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, isGroup, sender, reply }) => {
     try {
-        if (!isGroup) return reply("❌ *This game can only be played in groups!*");
+        if (!isGroup) return reply("❌ *This game can only be played in groups!*\n\n> ® Powered by Tyrex Tech");
         
         const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
         if (mentioned.length === 0) {
-            return reply("❌ *Mention someone to play with!*\nExample: .tictactoe @user");
+            return reply("❌ *Mention someone to play with!*\nExample: .tictactoe @user\n\n> ® Powered by Tyrex Tech");
         }
         
         const opponent = mentioned[0];
-        if (opponent === sender) return reply("❌ *You cannot play with yourself!*");
+        if (opponent === sender) return reply("❌ *You cannot play with yourself!*\n\n> ® Powered by Tyrex Tech");
         
         const gameId = from + sender;
         if (activeGames.tictactoe.has(gameId)) {
-            return reply("❌ *You already have an active game!*");
+            return reply("❌ *You already have an active game!*\n\n> ® Powered by Tyrex Tech");
         }
         
-        // Initialize game
         const board = [
             ['⬜', '⬜', '⬜'],
             ['⬜', '⬜', '⬜'],
@@ -95,7 +74,7 @@ cmd({
             boardDisplay += row.join(' ') + '\n';
         });
         
-        await reply(`⭕ *TIC TAC TOE*\n\n${boardDisplay}\n🎮 ${sender.split('@')[0]} (X) vs ${opponent.split('@')[0]} (O)\n\n👉 It's *@${sender.split('@')[0]}'s* turn!\nUse .move <row> <col> (1-3)`, {
+        await reply(`⭕ *TIC TAC TOE*\n\n${boardDisplay}\n🎮 ${sender.split('@')[0]} (X) vs ${opponent.split('@')[0]} (O)\n\n👉 It's *@${sender.split('@')[0]}'s* turn!\nUse .move <row> <col> (1-3)\n\n> ® Powered by Tyrex Tech`, {
             contextInfo: { mentionedJid: [sender, opponent] }
         });
         
@@ -116,48 +95,42 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.tictactoe.get(gameId);
         
-        if (!game) return reply("❌ *No active game!* Start one with .tictactoe");
-        if (game.turn !== sender) return reply("❌ *Not your turn!*");
+        if (!game) return reply("❌ *No active game!* Start one with .tictactoe\n\n> ® Powered by Tyrex Tech");
+        if (game.turn !== sender) return reply("❌ *Not your turn!*\n\n> ® Powered by Tyrex Tech");
         
         const [row, col] = q.split(' ').map(Number);
         if (!row || !col || row < 1 || row > 3 || col < 1 || col > 3) {
-            return reply("❌ *Invalid move!* Use .move <row> <col> (1-3)");
+            return reply("❌ *Invalid move!* Use .move <row> <col> (1-3)\n\n> ® Powered by Tyrex Tech");
         }
         
         const board = game.board;
         if (board[row-1][col-1] !== '⬜') {
-            return reply("❌ *Cell already taken!*");
+            return reply("❌ *Cell already taken!*\n\n> ® Powered by Tyrex Tech");
         }
         
-        // Make move
         const symbol = game.moves % 2 === 0 ? '❌' : '⭕';
         board[row-1][col-1] = symbol;
         game.moves++;
         
-        // Check winner
-        const winner = checkWinner(board);
+        const winner = checkWinner(board, game);
         let boardDisplay = '';
-        board.forEach(row => row.forEach(cell => boardDisplay += cell + ' '));
+        board.forEach(row => boardDisplay += row.join(' ') + '\n');
         
         if (winner) {
             activeGames.tictactoe.delete(gameId);
-            return reply(`🎉 *WINNER!*\n\n${boardDisplay}\n\n👑 @${winner.split('@')[0]} wins!`, {
+            return reply(`🎉 *WINNER!*\n\n${boardDisplay}\n\n👑 @${winner.split('@')[0]} wins!\n\n> ® Powered by Tyrex Tech`, {
                 contextInfo: { mentionedJid: [winner] }
             });
         }
         
         if (game.moves === 9) {
             activeGames.tictactoe.delete(gameId);
-            return reply(`🤝 *DRAW!*\n\n${boardDisplay}\n\nGood game!`);
+            return reply(`🤝 *DRAW!*\n\n${boardDisplay}\n\nGood game!\n\n> ® Powered by Tyrex Tech`);
         }
         
         game.turn = game.players.find(p => p !== sender);
-        boardDisplay = '';
-        board.forEach(row => {
-            boardDisplay += row.join(' ') + '\n';
-        });
         
-        reply(`⭕ *TIC TAC TOE*\n\n${boardDisplay}\n\n👉 It's *@${game.turn.split('@')[0]}'s* turn!`, {
+        reply(`⭕ *TIC TAC TOE*\n\n${boardDisplay}\n\n👉 It's *@${game.turn.split('@')[0]}'s* turn!\n\n> ® Powered by Tyrex Tech`, {
             contextInfo: { mentionedJid: [game.turn] }
         });
         
@@ -166,11 +139,11 @@ cmd({
     }
 });
 
-function checkWinner(board) {
+function checkWinner(board, game) {
     const lines = [
-        [[0,0], [0,1], [0,2]], [[1,0], [1,1], [1,2]], [[2,0], [2,1], [2,2]], // rows
-        [[0,0], [1,0], [2,0]], [[0,1], [1,1], [2,1]], [[0,2], [1,2], [2,2]], // columns
-        [[0,0], [1,1], [2,2]], [[0,2], [1,1], [2,0]] // diagonals
+        [[0,0], [0,1], [0,2]], [[1,0], [1,1], [1,2]], [[2,0], [2,1], [2,2]],
+        [[0,0], [1,0], [2,0]], [[0,1], [1,1], [2,1]], [[0,2], [1,2], [2,2]],
+        [[0,0], [1,1], [2,2]], [[0,2], [1,1], [2,0]]
     ];
     
     for (let line of lines) {
@@ -196,7 +169,7 @@ cmd({
     try {
         const gameId = from + sender;
         if (activeGames.guessNumber.has(gameId)) {
-            return reply("❌ *You already have an active game!*");
+            return reply("❌ *You already have an active game!*\n\n> ® Powered by Tyrex Tech");
         }
         
         const number = Math.floor(Math.random() * 100) + 1;
@@ -206,7 +179,7 @@ cmd({
             maxAttempts: 7
         });
         
-        reply(`🔢 *GUESS THE NUMBER*\n\nI'm thinking of a number between 1-100.\nYou have 7 attempts.\n\nUse .guess <number>`);
+        reply(`🔢 *GUESS THE NUMBER*\n\nI'm thinking of a number between 1-100.\nYou have 7 attempts.\n\nUse .gnumber <number>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Game error.');
@@ -214,7 +187,7 @@ cmd({
 });
 
 cmd({
-    pattern: "guess",
+    pattern: "gnumber",
     alias: ["g"],
     desc: "Make a guess in number game",
     category: "games",
@@ -225,27 +198,27 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.guessNumber.get(gameId);
         
-        if (!game) return reply("❌ *No active game!* Start with .guessnumber");
+        if (!game) return reply("❌ *No active game!* Start with .guessnumber\n\n> ® Powered by Tyrex Tech");
         
         const guess = parseInt(q);
         if (isNaN(guess) || guess < 1 || guess > 100) {
-            return reply("❌ *Enter a number between 1-100!*");
+            return reply("❌ *Enter a number between 1-100!*\n\n> ® Powered by Tyrex Tech");
         }
         
         game.attempts++;
         
         if (guess === game.number) {
             activeGames.guessNumber.delete(gameId);
-            return reply(`🎉 *CORRECT!*\n\nYou guessed ${game.number} in ${game.attempts} attempts!`);
+            return reply(`🎉 *CORRECT!*\n\nYou guessed ${game.number} in ${game.attempts} attempts!\n\n> ® Powered by Tyrex Tech`);
         }
         
         if (game.attempts >= game.maxAttempts) {
             activeGames.guessNumber.delete(gameId);
-            return reply(`😢 *GAME OVER!*\n\nThe number was ${game.number}`);
+            return reply(`😢 *GAME OVER!*\n\nThe number was ${game.number}\n\n> ® Powered by Tyrex Tech`);
         }
         
         const hint = guess < game.number ? 'higher' : 'lower';
-        reply(`❌ *Wrong!* Try ${hint}.\nAttempts: ${game.attempts}/${game.maxAttempts}`);
+        reply(`❌ *Wrong!* Try ${hint}.\nAttempts: ${game.attempts}/${game.maxAttempts}\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Guess error.');
@@ -262,11 +235,11 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, isGroup, sender, reply }) => {
     try {
-        if (!isGroup) return reply("❌ *This game can only be played in groups!*");
+        if (!isGroup) return reply("❌ *This game can only be played in groups!*\n\n> ® Powered by Tyrex Tech");
         
         const gameId = from;
         if (activeGames.wordChain.has(gameId)) {
-            return reply("❌ *Game already running in this group!*");
+            return reply("❌ *Game already running in this group!*\n\n> ® Powered by Tyrex Tech");
         }
         
         const startWord = "start";
@@ -278,7 +251,7 @@ cmd({
             usedWords: [startWord]
         });
         
-        reply(`🔗 *WORD CHAIN*\n\nGame started by @${sender.split('@')[0]}!\nFirst word: *${startWord}*\nNext word must start with letter: *T*\n\nUse .chain <word>`, {
+        reply(`🔗 *WORD CHAIN*\n\nGame started by @${sender.split('@')[0]}!\nFirst word: *${startWord}*\nNext word must start with letter: *T*\n\nUse .wchain <word>\n\n> ® Powered by Tyrex Tech`, {
             contextInfo: { mentionedJid: [sender] }
         });
         
@@ -288,7 +261,7 @@ cmd({
 });
 
 cmd({
-    pattern: "chain",
+    pattern: "wchain",
     alias: ["wc"],
     desc: "Add word to chain",
     category: "games",
@@ -299,30 +272,29 @@ cmd({
         const gameId = from;
         const game = activeGames.wordChain.get(gameId);
         
-        if (!game) return reply("❌ *No active game!* Start with .wordchain");
-        if (game.turn !== sender) return reply("❌ *Not your turn!*");
+        if (!game) return reply("❌ *No active game!* Start with .wordchain\n\n> ® Powered by Tyrex Tech");
+        if (game.turn !== sender) return reply("❌ *Not your turn!*\n\n> ® Powered by Tyrex Tech");
         
         const word = q.toLowerCase().trim();
-        if (!word) return reply("❌ *Enter a word!*");
+        if (!word) return reply("❌ *Enter a word!*\n\n> ® Powered by Tyrex Tech");
         
-        if (word.length < 3) return reply("❌ *Word must be at least 3 letters!*");
-        if (game.usedWords.includes(word)) return reply("❌ *Word already used!*");
+        if (word.length < 3) return reply("❌ *Word must be at least 3 letters!*\n\n> ® Powered by Tyrex Tech");
+        if (game.usedWords.includes(word)) return reply("❌ *Word already used!*\n\n> ® Powered by Tyrex Tech");
         
         const firstLetter = word[0];
         if (firstLetter !== game.lastLetter) {
-            return reply(`❌ *Word must start with "${game.lastLetter.toUpperCase()}"!*`);
+            return reply(`❌ *Word must start with "${game.lastLetter.toUpperCase()}"!*\n\n> ® Powered by Tyrex Tech`);
         }
         
         game.usedWords.push(word);
         game.lastWord = word;
         game.lastLetter = word[word.length - 1];
         
-        // Switch turn to next player
         const players = game.players;
         const currentIndex = players.indexOf(sender);
         game.turn = players[(currentIndex + 1) % players.length];
         
-        reply(`✅ *Valid!*\n\nWord: ${word}\nNext letter: *${game.lastLetter.toUpperCase()}*\n\n👉 @${game.turn.split('@')[0]}'s turn!`, {
+        reply(`✅ *Valid!*\n\nWord: ${word}\nNext letter: *${game.lastLetter.toUpperCase()}*\n\n👉 @${game.turn.split('@')[0]}'s turn!\n\n> ® Powered by Tyrex Tech`, {
             contextInfo: { mentionedJid: [game.turn] }
         });
         
@@ -348,7 +320,7 @@ cmd({
     try {
         const gameId = from + sender;
         if (activeGames.hangman.has(gameId)) {
-            return reply("❌ *You already have an active game!*");
+            return reply("❌ *You already have an active game!*\n\n> ® Powered by Tyrex Tech");
         }
         
         const word = hangmanWords[Math.floor(Math.random() * hangmanWords.length)];
@@ -362,7 +334,7 @@ cmd({
             display: display
         });
         
-        reply(`🪢 *HANGMAN*\n\nWord: ${display}\nAttempts: 0/6\n\nUse .hang <letter>`);
+        reply(`🪢 *HANGMAN*\n\nWord: ${display}\nAttempts: 0/6\n\nUse .hguess <letter>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Game error.');
@@ -370,8 +342,8 @@ cmd({
 });
 
 cmd({
-    pattern: "hang",
-    alias: ["hguess"],
+    pattern: "hguess",
+    alias: ["hangguess"],
     desc: "Guess a letter in Hangman",
     category: "games",
     react: "🔤",
@@ -381,21 +353,20 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.hangman.get(gameId);
         
-        if (!game) return reply("❌ *No active game!* Start with .hangman");
+        if (!game) return reply("❌ *No active game!* Start with .hangman\n\n> ® Powered by Tyrex Tech");
         
         const letter = q.toLowerCase().trim();
         if (!letter || letter.length !== 1 || !/[a-z]/.test(letter)) {
-            return reply("❌ *Enter a single letter!*");
+            return reply("❌ *Enter a single letter!*\n\n> ® Powered by Tyrex Tech");
         }
         
         if (game.guessed.includes(letter)) {
-            return reply("❌ *Letter already guessed!*");
+            return reply("❌ *Letter already guessed!*\n\n> ® Powered by Tyrex Tech");
         }
         
         game.guessed.push(letter);
         
         if (game.word.includes(letter)) {
-            // Correct guess
             let display = '';
             for (let char of game.word) {
                 display += game.guessed.includes(char) ? char : '_';
@@ -404,21 +375,20 @@ cmd({
             
             if (!display.includes('_')) {
                 activeGames.hangman.delete(gameId);
-                return reply(`🎉 *YOU WIN!*\n\nWord: ${game.word}`);
+                return reply(`🎉 *YOU WIN!*\n\nWord: ${game.word}\n\n> ® Powered by Tyrex Tech`);
             }
             
-            reply(`✅ *Correct!*\n\nWord: ${game.display}\nAttempts: ${game.attempts}/6`);
+            reply(`✅ *Correct!*\n\nWord: ${game.display}\nAttempts: ${game.attempts}/6\n\n> ® Powered by Tyrex Tech`);
             
         } else {
-            // Wrong guess
             game.attempts++;
             
             if (game.attempts >= game.maxAttempts) {
                 activeGames.hangman.delete(gameId);
-                return reply(`😢 *GAME OVER!*\n\nWord was: ${game.word}`);
+                return reply(`😢 *GAME OVER!*\n\nWord was: ${game.word}\n\n> ® Powered by Tyrex Tech`);
             }
             
-            reply(`❌ *Wrong!*\n\nWord: ${game.display}\nAttempts: ${game.attempts}/6`);
+            reply(`❌ *Wrong!*\n\nWord: ${game.display}\nAttempts: ${game.attempts}/6\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -428,31 +398,11 @@ cmd({
 
 // ==================== 5. QUIZ ====================
 const quizQuestions = [
-    {
-        question: "What is the capital of Tanzania?",
-        options: ["Dar es Salaam", "Dodoma", "Arusha", "Mwanza"],
-        answer: 1
-    },
-    {
-        question: "Which programming language is this bot written in?",
-        options: ["Python", "Java", "JavaScript", "C++"],
-        answer: 2
-    },
-    {
-        question: "What is 5 + 7?",
-        options: ["10", "11", "12", "13"],
-        answer: 2
-    },
-    {
-        question: "Which planet is known as the Red Planet?",
-        options: ["Venus", "Mars", "Jupiter", "Saturn"],
-        answer: 1
-    },
-    {
-        question: "What is the largest ocean on Earth?",
-        options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-        answer: 3
-    }
+    { question: "What is the capital of Tanzania?", options: ["Dar es Salaam", "Dodoma", "Arusha", "Mwanza"], answer: 1 },
+    { question: "Which programming language is this bot written in?", options: ["Python", "Java", "JavaScript", "C++"], answer: 2 },
+    { question: "What is 5 + 7?", options: ["10", "11", "12", "13"], answer: 2 },
+    { question: "Which planet is known as the Red Planet?", options: ["Venus", "Mars", "Jupiter", "Saturn"], answer: 1 },
+    { question: "What is the largest ocean on Earth?", options: ["Atlantic", "Indian", "Arctic", "Pacific"], answer: 3 }
 ];
 
 cmd({
@@ -466,22 +416,19 @@ cmd({
     try {
         const gameId = from + sender;
         if (activeGames.quiz.has(gameId)) {
-            return reply("❌ *You already have an active quiz!*");
+            return reply("❌ *You already have an active quiz!*\n\n> ® Powered by Tyrex Tech");
         }
         
         const q = quizQuestions[Math.floor(Math.random() * quizQuestions.length)];
         
-        activeGames.quiz.set(gameId, {
-            question: q,
-            answered: false
-        });
+        activeGames.quiz.set(gameId, { question: q, answered: false });
         
         let options = '';
         q.options.forEach((opt, i) => {
             options += `${i+1}. ${opt}\n`;
         });
         
-        reply(`❓ *QUIZ*\n\n${q.question}\n\n${options}\nReply with the number (1-4)`);
+        reply(`❓ *QUIZ*\n\n${q.question}\n\n${options}\nReply with the number (1-4)\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Quiz error.');
@@ -489,7 +436,7 @@ cmd({
 });
 
 cmd({
-    pattern: "answer",
+    pattern: "qanswer",
     alias: ["ans"],
     desc: "Answer the quiz question",
     category: "games",
@@ -500,21 +447,21 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.quiz.get(gameId);
         
-        if (!game) return reply("❌ *No active quiz!* Start with .quiz");
-        if (game.answered) return reply("❌ *Question already answered!*");
+        if (!game) return reply("❌ *No active quiz!* Start with .quiz\n\n> ® Powered by Tyrex Tech");
+        if (game.answered) return reply("❌ *Question already answered!*\n\n> ® Powered by Tyrex Tech");
         
         const answer = parseInt(q) - 1;
         if (isNaN(answer) || answer < 0 || answer > 3) {
-            return reply("❌ *Enter a number between 1-4!*");
+            return reply("❌ *Enter a number between 1-4!*\n\n> ® Powered by Tyrex Tech");
         }
         
         game.answered = true;
         activeGames.quiz.delete(gameId);
         
         if (answer === game.question.answer) {
-            reply(`✅ *CORRECT!*\n\n+10 points!`);
+            reply(`✅ *CORRECT!*\n\n+10 points!\n\n> ® Powered by Tyrex Tech`);
         } else {
-            reply(`❌ *WRONG!*\n\nCorrect answer: ${game.question.options[game.question.answer]}`);
+            reply(`❌ *WRONG!*\n\nCorrect answer: ${game.question.options[game.question.answer]}\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -524,26 +471,11 @@ cmd({
 
 // ==================== 6. RIDDLE ====================
 const riddles = [
-    {
-        riddle: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?",
-        answer: "echo"
-    },
-    {
-        riddle: "You measure my life in hours and I serve you by expiring. I'm quick when I'm thin and slow when I'm fat. Wind is my enemy. What am I?",
-        answer: "candle"
-    },
-    {
-        riddle: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",
-        answer: "map"
-    },
-    {
-        riddle: "What is seen in the middle of March and April that can't be seen at the beginning or end of either month?",
-        answer: "r"
-    },
-    {
-        riddle: "What word becomes shorter when you add two letters to it?",
-        answer: "short"
-    }
+    { riddle: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?", answer: "echo" },
+    { riddle: "You measure my life in hours and I serve you by expiring. I'm quick when I'm thin and slow when I'm fat. Wind is my enemy. What am I?", answer: "candle" },
+    { riddle: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?", answer: "map" },
+    { riddle: "What is seen in the middle of March and April that can't be seen at the beginning or end of either month?", answer: "r" },
+    { riddle: "What word becomes shorter when you add two letters to it?", answer: "short" }
 ];
 
 cmd({
@@ -558,12 +490,9 @@ cmd({
         const riddle = riddles[Math.floor(Math.random() * riddles.length)];
         const gameId = from + sender;
         
-        activeGames.riddle.set(gameId, {
-            answer: riddle.answer,
-            attempts: 0
-        });
+        activeGames.riddle.set(gameId, { answer: riddle.answer, attempts: 0 });
         
-        reply(`🧩 *RIDDLE*\n\n${riddle.riddle}\n\nUse .solve <answer>`);
+        reply(`🧩 *RIDDLE*\n\n${riddle.riddle}\n\nUse .rsolve <answer>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Riddle error.');
@@ -571,7 +500,7 @@ cmd({
 });
 
 cmd({
-    pattern: "solve",
+    pattern: "rsolve",
     alias: ["riddleanswer"],
     desc: "Solve the riddle",
     category: "games",
@@ -582,20 +511,20 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.riddle.get(gameId);
         
-        if (!game) return reply("❌ *No active riddle!* Get one with .riddle");
+        if (!game) return reply("❌ *No active riddle!* Get one with .riddle\n\n> ® Powered by Tyrex Tech");
         
         const answer = q.toLowerCase().trim();
         game.attempts++;
         
         if (answer === game.answer) {
             activeGames.riddle.delete(gameId);
-            reply(`✅ *CORRECT!*\n\nYou solved it in ${game.attempts} attempt(s)!`);
+            reply(`✅ *CORRECT!*\n\nYou solved it in ${game.attempts} attempt(s)!\n\n> ® Powered by Tyrex Tech`);
         } else {
             if (game.attempts >= 3) {
                 activeGames.riddle.delete(gameId);
-                reply(`😢 *GAME OVER!*\n\nAnswer was: ${game.answer}`);
+                reply(`😢 *GAME OVER!*\n\nAnswer was: ${game.answer}\n\n> ® Powered by Tyrex Tech`);
             } else {
-                reply(`❌ *Wrong!* Try again (${game.attempts}/3)`);
+                reply(`❌ *Wrong!* Try again (${game.attempts}/3)\n\n> ® Powered by Tyrex Tech`);
             }
         }
         
@@ -627,7 +556,7 @@ cmd({
         const gameId = from + sender;
         activeGames.mathQuiz.set(gameId, { answer });
         
-        reply(`🧮 *MATH QUIZ*\n\n${num1} ${op} ${num2} = ?\n\nUse .mathanswer <number>`);
+        reply(`🧮 *MATH QUIZ*\n\n${num1} ${op} ${num2} = ?\n\nUse .mans <number>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Math error.');
@@ -635,8 +564,8 @@ cmd({
 });
 
 cmd({
-    pattern: "mathanswer",
-    alias: ["mans"],
+    pattern: "mans",
+    alias: ["mathanswer"],
     desc: "Answer math question",
     category: "games",
     react: "✅",
@@ -646,17 +575,17 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.mathQuiz.get(gameId);
         
-        if (!game) return reply("❌ *No active math quiz!* Start with .math");
+        if (!game) return reply("❌ *No active math quiz!* Start with .math\n\n> ® Powered by Tyrex Tech");
         
         const answer = parseInt(q);
-        if (isNaN(answer)) return reply("❌ *Enter a number!*");
+        if (isNaN(answer)) return reply("❌ *Enter a number!*\n\n> ® Powered by Tyrex Tech");
         
         activeGames.mathQuiz.delete(gameId);
         
         if (answer === game.answer) {
-            reply(`✅ *CORRECT!*\n\nAnswer: ${game.answer}`);
+            reply(`✅ *CORRECT!*\n\nAnswer: ${game.answer}\n\n> ® Powered by Tyrex Tech`);
         } else {
-            reply(`❌ *WRONG!*\n\nCorrect answer: ${game.answer}`);
+            reply(`❌ *WRONG!*\n\nCorrect answer: ${game.answer}\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -666,31 +595,16 @@ cmd({
 
 // ==================== 8. EMOJI QUIZ ====================
 const emojiQuizzes = [
-    {
-        emoji: "🐱🐶🐭🐹",
-        answer: "pets"
-    },
-    {
-        emoji: "🍎🍌🍇🍊",
-        answer: "fruits"
-    },
-    {
-        emoji: "🚗✈️🚲🚢",
-        answer: "vehicles"
-    },
-    {
-        emoji: "🇹🇿🇰🇪🇺🇬🇷🇼",
-        answer: "countries"
-    },
-    {
-        emoji: "🎮🎲🎯🎰",
-        answer: "games"
-    }
+    { emoji: "🐱🐶🐭🐹", answer: "pets" },
+    { emoji: "🍎🍌🍇🍊", answer: "fruits" },
+    { emoji: "🚗✈️🚲🚢", answer: "vehicles" },
+    { emoji: "🇹🇿🇰🇪🇺🇬🇷🇼", answer: "countries" },
+    { emoji: "🎮🎲🎯🎰", answer: "games" }
 ];
 
 cmd({
-    pattern: "emoji",
-    alias: ["emojiq"],
+    pattern: "emojiq",
+    alias: ["emoji"],
     desc: "Guess the category from emojis",
     category: "games",
     react: "😊",
@@ -702,7 +616,7 @@ cmd({
         
         activeGames.emojiQuiz.set(gameId, { answer: quiz.answer });
         
-        reply(`😊 *EMOJI QUIZ*\n\n${quiz.emoji}\n\nWhat category is this?\nUse .emojianswer <answer>`);
+        reply(`😊 *EMOJI QUIZ*\n\n${quiz.emoji}\n\nWhat category is this?\nUse .eans <answer>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Emoji quiz error.');
@@ -710,8 +624,8 @@ cmd({
 });
 
 cmd({
-    pattern: "emojianswer",
-    alias: ["eans"],
+    pattern: "eans",
+    alias: ["emojianswer"],
     desc: "Answer emoji quiz",
     category: "games",
     react: "✅",
@@ -721,15 +635,15 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.emojiQuiz.get(gameId);
         
-        if (!game) return reply("❌ *No active emoji quiz!* Start with .emoji");
+        if (!game) return reply("❌ *No active emoji quiz!* Start with .emojiq\n\n> ® Powered by Tyrex Tech");
         
         const answer = q.toLowerCase().trim();
         activeGames.emojiQuiz.delete(gameId);
         
         if (answer === game.answer) {
-            reply(`✅ *CORRECT!*`);
+            reply(`✅ *CORRECT!*\n\n> ® Powered by Tyrex Tech`);
         } else {
-            reply(`❌ *WRONG!*\n\nAnswer: ${game.answer}`);
+            reply(`❌ *WRONG!*\n\nAnswer: ${game.answer}\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -753,18 +667,15 @@ cmd({
         }
         
         const gameId = from + sender;
-        activeGames.memory.set(gameId, {
-            numbers,
-            revealed: false
-        });
+        activeGames.memory.set(gameId, { numbers, revealed: false });
         
-        reply(`🧠 *MEMORY GAME*\n\nMemorize these numbers:\n${numbers.join(' - ')}\n\nYou have 10 seconds!\nUse .recall when ready`);
+        reply(`🧠 *MEMORY GAME*\n\nMemorize these numbers:\n${numbers.join(' - ')}\n\nYou have 10 seconds!\nUse .recall when ready\n\n> ® Powered by Tyrex Tech`);
         
         setTimeout(() => {
             const game = activeGames.memory.get(gameId);
             if (game && !game.revealed) {
                 game.revealed = true;
-                reply(`⏰ *Time's up!*\n\nUse .recall to enter the numbers`);
+                reply(`⏰ *Time's up!*\n\nUse .recall to enter the numbers\n\n> ® Powered by Tyrex Tech`);
             }
         }, 10000);
         
@@ -785,11 +696,11 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.memory.get(gameId);
         
-        if (!game) return reply("❌ *No active memory game!* Start with .memory");
+        if (!game) return reply("❌ *No active memory game!* Start with .memory\n\n> ® Powered by Tyrex Tech");
         
         const numbers = q.split(' ').map(Number);
         if (numbers.length !== 5 || numbers.some(isNaN)) {
-            return reply("❌ *Enter 5 numbers separated by spaces!*");
+            return reply("❌ *Enter 5 numbers separated by spaces!*\n\n> ® Powered by Tyrex Tech");
         }
         
         activeGames.memory.delete(gameId);
@@ -800,9 +711,9 @@ cmd({
         }
         
         if (correct === 5) {
-            reply(`🎉 *PERFECT!*\n\nYou remembered all numbers!`);
+            reply(`🎉 *PERFECT!*\n\nYou remembered all numbers!\n\n> ® Powered by Tyrex Tech`);
         } else {
-            reply(`📊 *RESULTS*\n\nCorrect: ${correct}/5\nNumbers: ${game.numbers.join(' - ')}`);
+            reply(`📊 *RESULTS*\n\nCorrect: ${correct}/5\nNumbers: ${game.numbers.join(' - ')}\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -820,8 +731,8 @@ const typingTexts = [
 ];
 
 cmd({
-    pattern: "type",
-    alias: ["typing"],
+    pattern: "typing",
+    alias: ["type"],
     desc: "Test your typing speed",
     category: "games",
     react: "⌨️",
@@ -831,12 +742,9 @@ cmd({
         const text = typingTexts[Math.floor(Math.random() * typingTexts.length)];
         const gameId = from + sender;
         
-        activeGames.typingRace.set(gameId, {
-            text,
-            startTime: Date.now()
-        });
+        activeGames.typingRace.set(gameId, { text, startTime: Date.now() });
         
-        reply(`⌨️ *TYPING RACE*\n\nType this exactly:\n\n"${text}"\n\nUse .typeit <text>`);
+        reply(`⌨️ *TYPING RACE*\n\nType this exactly:\n\n"${text}"\n\nUse .typeit <text>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Typing game error.');
@@ -855,7 +763,7 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.typingRace.get(gameId);
         
-        if (!game) return reply("❌ *No active typing game!* Start with .type");
+        if (!game) return reply("❌ *No active typing game!* Start with .typing\n\n> ® Powered by Tyrex Tech");
         
         const typed = q.trim();
         const time = (Date.now() - game.startTime) / 1000;
@@ -864,9 +772,9 @@ cmd({
         
         if (typed === game.text) {
             const wpm = Math.round((game.text.split(' ').length / time) * 60);
-            reply(`✅ *PERFECT!*\n\nTime: ${time.toFixed(2)}s\nSpeed: ${wpm} WPM`);
+            reply(`✅ *PERFECT!*\n\nTime: ${time.toFixed(2)}s\nSpeed: ${wpm} WPM\n\n> ® Powered by Tyrex Tech`);
         } else {
-            reply(`❌ *MISTAKES!*\n\nTime: ${time.toFixed(2)}s\n\nCorrect text: ${game.text}`);
+            reply(`❌ *MISTAKES!*\n\nTime: ${time.toFixed(2)}s\n\nCorrect text: ${game.text}\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -888,7 +796,7 @@ cmd({
         const playerChoice = q.toLowerCase();
         
         if (!choices.includes(playerChoice)) {
-            return reply("❌ *Choose:* rock, paper, or scissors");
+            return reply("❌ *Choose:* rock, paper, or scissors\n\n> ® Powered by Tyrex Tech");
         }
         
         const botChoice = choices[Math.floor(Math.random() * choices.length)];
@@ -906,7 +814,7 @@ cmd({
             result = "😢 *BOT WINS!*";
         }
         
-        reply(`✂️ *ROCK PAPER SCISSORS*\n\nYou: ${playerChoice}\nBot: ${botChoice}\n\n${result}`);
+        reply(`✂️ *ROCK PAPER SCISSORS*\n\nYou: ${playerChoice}\nBot: ${botChoice}\n\n${result}\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Game error.');
@@ -915,29 +823,19 @@ cmd({
 
 // ==================== 12. TRUTH OR DARE ====================
 const truths = [
-    "What's your biggest fear?",
-    "Have you ever lied to your best friend?",
-    "What's the most embarrassing thing you've done?",
-    "Who was your first crush?",
-    "Have you ever cheated on a test?",
-    "What's your biggest secret?",
-    "Have you ever stolen anything?",
-    "What's the worst thing you've said to someone?",
-    "Who do you secretly dislike?",
-    "What's your guilty pleasure?"
+    "What's your biggest fear?", "Have you ever lied to your best friend?",
+    "What's the most embarrassing thing you've done?", "Who was your first crush?",
+    "Have you ever cheated on a test?", "What's your biggest secret?",
+    "Have you ever stolen anything?", "What's the worst thing you've said to someone?",
+    "Who do you secretly dislike?", "What's your guilty pleasure?"
 ];
 
 const dares = [
-    "Send a random emoji to your last chat",
-    "Do 10 pushups",
-    "Sing a song and record it",
-    "Call someone and say I love you",
-    "Post an embarrassing photo of yourself",
-    "Talk in a funny voice for 1 minute",
-    "Do a funny dance",
-    "Text your ex 'I miss you'",
-    "Eat something without using your hands",
-    "Act like a chicken for 30 seconds"
+    "Send a random emoji to your last chat", "Do 10 pushups",
+    "Sing a song and record it", "Call someone and say I love you",
+    "Post an embarrassing photo of yourself", "Talk in a funny voice for 1 minute",
+    "Do a funny dance", "Text your ex 'I miss you'",
+    "Eat something without using your hands", "Act like a chicken for 30 seconds"
 ];
 
 cmd({
@@ -949,7 +847,7 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { reply }) => {
     const truth = truths[Math.floor(Math.random() * truths.length)];
-    reply(`🤔 *TRUTH*\n\n${truth}`);
+    reply(`🤔 *TRUTH*\n\n${truth}\n\n> ® Powered by Tyrex Tech`);
 });
 
 cmd({
@@ -961,7 +859,7 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { reply }) => {
     const dare = dares[Math.floor(Math.random() * dares.length)];
-    reply(`😈 *DARE*\n\n${dare}`);
+    reply(`😈 *DARE*\n\n${dare}\n\n> ® Powered by Tyrex Tech`);
 });
 
 // ==================== 13. WOULD YOU RATHER ====================
@@ -987,7 +885,7 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { reply }) => {
     const question = wyrQuestions[Math.floor(Math.random() * wyrQuestions.length)];
-    reply(`🤷 *WOULD YOU RATHER*\n\n${question}`);
+    reply(`🤷 *WOULD YOU RATHER*\n\n${question}\n\n> ® Powered by Tyrex Tech`);
 });
 
 // ==================== 14. WORD SCRAMBLE ====================
@@ -1011,7 +909,7 @@ cmd({
         const gameId = from + sender;
         activeGames.wordScramble.set(gameId, { word });
         
-        reply(`🔄 *WORD SCRAMBLE*\n\nScrambled: *${scrambled}*\n\nUse .unscramble <word>`);
+        reply(`🔄 *WORD SCRAMBLE*\n\nScrambled: *${scrambled}*\n\nUse .uns <word>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Scramble error.');
@@ -1019,8 +917,8 @@ cmd({
 });
 
 cmd({
-    pattern: "unscramble",
-    alias: ["us"],
+    pattern: "uns",
+    alias: ["unscramble"],
     desc: "Submit unscrambled word",
     category: "games",
     react: "✅",
@@ -1030,15 +928,15 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.wordScramble.get(gameId);
         
-        if (!game) return reply("❌ *No active scramble!* Start with .scramble");
+        if (!game) return reply("❌ *No active scramble!* Start with .scramble\n\n> ® Powered by Tyrex Tech");
         
         const guess = q.toLowerCase().trim();
         activeGames.wordScramble.delete(gameId);
         
         if (guess === game.word) {
-            reply(`✅ *CORRECT!*\n\nWord: ${game.word}`);
+            reply(`✅ *CORRECT!*\n\nWord: ${game.word}\n\n> ® Powered by Tyrex Tech`);
         } else {
-            reply(`❌ *WRONG!*\n\nCorrect word: ${game.word}`);
+            reply(`❌ *WRONG!*\n\nCorrect word: ${game.word}\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -1055,20 +953,7 @@ cmd({
     react: "🔲",
     filename: __filename
 }, async (conn, mek, m, { reply }) => {
-    const puzzle = `
-🔲 *CROSSWORD*
-
-Across:
-1. WhatsApp command prefix (4)
-3. Bot creator (4)
-
-Down:
-2. Programming language (10)
-
-Hint: Answer format: .cw <number> <answer>
-    `;
-    
-    reply(puzzle);
+    reply(`🔲 *CROSSWORD*\n\nAcross:\n1. WhatsApp command prefix (3)\n3. Bot name (5)\n\nDown:\n2. Programming language (10)\n\nHint: Answer format: .cw <number> <answer>\n\n> ® Powered by Tyrex Tech`);
 });
 
 cmd({
@@ -1080,16 +965,12 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { q, reply }) => {
     const [num, ans] = q.split(' ');
-    const answers = {
-        '1': 'dot',
-        '2': 'javascript',
-        '3': 'sila'
-    };
+    const answers = { '1': 'dot', '2': 'javascript', '3': 'tyrex' };
     
     if (answers[num] && answers[num] === ans.toLowerCase()) {
-        reply(`✅ *Correct!*`);
+        reply(`✅ *Correct!*\n\n> ® Powered by Tyrex Tech`);
     } else {
-        reply(`❌ *Wrong!*`);
+        reply(`❌ *Wrong!*\n\n> ® Powered by Tyrex Tech`);
     }
 });
 
@@ -1102,25 +983,7 @@ cmd({
     react: "🔢",
     filename: __filename
 }, async (conn, mek, m, { reply }) => {
-    const puzzle = `
-🔢 *SUDOKU*
-
-5 3 . | . 7 . | . . .
-6 . . | 1 9 5 | . . .
-. 9 8 | . . . | . 6 .
-------+-------+------
-8 . . | . 6 . | . . 3
-4 . . | 8 . 3 | . . 1
-7 . . | . 2 . | . . 6
-------+-------+------
-. 6 . | . . . | 2 8 .
-. . . | 4 1 9 | . . 5
-. . . | . 8 . | . 7 9
-
-Use .solvesudoku <row> <col> <num>
-    `;
-    
-    reply(puzzle);
+    reply(`🔢 *SUDOKU*\n\n5 3 . | . 7 . | . . .\n6 . . | 1 9 5 | . . .\n. 9 8 | . . . | . 6 .\n------+-------+------\n8 . . | . 6 . | . . 3\n4 . . | 8 . 3 | . . 1\n7 . . | . 2 . | . . 6\n------+-------+------\n. 6 . | . . . | 2 8 .\n. . . | 4 1 9 | . . 5\n. . . | . 8 . | . 7 9\n\nUse .solvesudoku <row> <col> <num>\n\n> ® Powered by Tyrex Tech`);
 });
 
 // ==================== 17. CHESS ====================
@@ -1132,23 +995,7 @@ cmd({
     react: "♟️",
     filename: __filename
 }, async (conn, mek, m, { reply }) => {
-    const board = `
-♟️ *CHESS*
-
-8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
-7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
-6 . . . . . . . .
-5 . . . . . . . .
-4 . . . . . . . .
-3 . . . . . . . .
-2 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
-1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
-  a b c d e f g h
-
-Use .move <from> <to> (e.g., .move e2 e4)
-    `;
-    
-    reply(board);
+    reply(`♟️ *CHESS*\n\n8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜\n7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟\n6 . . . . . . . .\n5 . . . . . . . .\n4 . . . . . . . .\n3 . . . . . . . .\n2 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙\n1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖\n  a b c d e f g h\n\nUse .move <from> <to> (e.g., .move e2 e4)\n\n> ® Powered by Tyrex Tech`);
 });
 
 // ==================== 18. CHECKERS ====================
@@ -1160,51 +1007,20 @@ cmd({
     react: "⭕",
     filename: __filename
 }, async (conn, mek, m, { reply }) => {
-    const board = `
-⭕ *CHECKERS*
-
-8 ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜
-7 ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛
-6 ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜
-5 ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛
-4 ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜
-3 ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛
-2 ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜
-1 ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛
-  a b c d e f g h
-
-Use .checkermove <from> <to>
-    `;
-    
-    reply(board);
+    reply(`⭕ *CHECKERS*\n\n8 ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜\n7 ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛\n6 ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜\n5 ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛\n4 ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜\n3 ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛\n2 ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜\n1 ⬜ ⬛ ⬜ ⬛ ⬜ ⬛ ⬜ ⬛\n  a b c d e f g h\n\nUse .checkermove <from> <to>\n\n> ® Powered by Tyrex Tech`);
 });
 
 // ==================== 19. TRIVIA ====================
 const triviaQuestions = [
-    {
-        q: "What is the largest continent?",
-        a: "Asia"
-    },
-    {
-        q: "How many colors are in a rainbow?",
-        a: "7"
-    },
-    {
-        q: "What is the hardest natural substance?",
-        a: "Diamond"
-    },
-    {
-        q: "What is the fastest land animal?",
-        a: "Cheetah"
-    },
-    {
-        q: "How many hearts does an octopus have?",
-        a: "3"
-    }
+    { q: "What is the largest continent?", a: "Asia" },
+    { q: "How many colors are in a rainbow?", a: "7" },
+    { q: "What is the hardest natural substance?", a: "Diamond" },
+    { q: "What is the fastest land animal?", a: "Cheetah" },
+    { q: "How many hearts does an octopus have?", a: "3" }
 ];
 
 cmd({
-    pattern: "trivia",
+    pattern: "triviaq",
     alias: ["triv"],
     desc: "Random trivia question",
     category: "games",
@@ -1217,7 +1033,7 @@ cmd({
         
         activeGames.trivia.set(gameId, { answer: q.a });
         
-        reply(`❓ *TRIVIA*\n\n${q.q}\n\nUse .triviaanswer <answer>`);
+        reply(`❓ *TRIVIA*\n\n${q.q}\n\nUse .tans <answer>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Trivia error.');
@@ -1225,8 +1041,8 @@ cmd({
 });
 
 cmd({
-    pattern: "triviaanswer",
-    alias: ["tans"],
+    pattern: "tans",
+    alias: ["triviaanswer"],
     desc: "Answer trivia question",
     category: "games",
     react: "✅",
@@ -1236,15 +1052,15 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.trivia.get(gameId);
         
-        if (!game) return reply("❌ *No active trivia!* Start with .trivia");
+        if (!game) return reply("❌ *No active trivia!* Start with .triviaq\n\n> ® Powered by Tyrex Tech");
         
         const answer = q.trim();
         activeGames.trivia.delete(gameId);
         
         if (answer.toLowerCase() === game.answer.toLowerCase()) {
-            reply(`✅ *CORRECT!*`);
+            reply(`✅ *CORRECT!*\n\n> ® Powered by Tyrex Tech`);
         } else {
-            reply(`❌ *WRONG!*\n\nAnswer: ${game.answer}`);
+            reply(`❌ *WRONG!*\n\nAnswer: ${game.answer}\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -1269,18 +1085,14 @@ cmd({
     try {
         const gameId = from + sender;
         if (activeGames.hangmanClassic.has(gameId)) {
-            return reply("❌ *You already have an active game!*");
+            return reply("❌ *You already have an active game!*\n\n> ® Powered by Tyrex Tech");
         }
         
         const word = classicWords[Math.floor(Math.random() * classicWords.length)];
         const display = '_'.repeat(word.length).split('').join(' ');
         
         activeGames.hangmanClassic.set(gameId, {
-            word,
-            guessed: [],
-            attempts: 0,
-            maxAttempts: 6,
-            display
+            word, guessed: [], attempts: 0, maxAttempts: 6, display
         });
         
         const hangmanStages = [
@@ -1293,7 +1105,7 @@ cmd({
             '  +---+\n  O   |\n /|\\  |\n / \\  |\n     ==='
         ];
         
-        reply(`🎭 *HANGMAN CLASSIC*\n\n${hangmanStages[0]}\n\nWord: ${display}\nAttempts: 0/6\n\nUse .hcguess <letter>`);
+        reply(`🎭 *HANGMAN CLASSIC*\n\n${hangmanStages[0]}\n\nWord: ${display}\nAttempts: 0/6\n\nUse .hcg <letter>\n\n> ® Powered by Tyrex Tech`);
         
     } catch (e) {
         reply('❌ Game error.');
@@ -1301,8 +1113,8 @@ cmd({
 });
 
 cmd({
-    pattern: "hcguess",
-    alias: ["hcg"],
+    pattern: "hcg",
+    alias: ["hcguess"],
     desc: "Guess in Hangman Classic",
     category: "games",
     react: "🔤",
@@ -1312,15 +1124,15 @@ cmd({
         const gameId = from + sender;
         const game = activeGames.hangmanClassic.get(gameId);
         
-        if (!game) return reply("❌ *No active game!* Start with .hangclassic");
+        if (!game) return reply("❌ *No active game!* Start with .hangclassic\n\n> ® Powered by Tyrex Tech");
         
         const letter = q.toLowerCase().trim();
         if (!letter || letter.length !== 1 || !/[a-z]/.test(letter)) {
-            return reply("❌ *Enter a single letter!*");
+            return reply("❌ *Enter a single letter!*\n\n> ® Powered by Tyrex Tech");
         }
         
         if (game.guessed.includes(letter)) {
-            return reply("❌ *Letter already guessed!*");
+            return reply("❌ *Letter already guessed!*\n\n> ® Powered by Tyrex Tech");
         }
         
         game.guessed.push(letter);
@@ -1336,7 +1148,6 @@ cmd({
         ];
         
         if (game.word.includes(letter)) {
-            // Correct guess
             let display = '';
             for (let char of game.word) {
                 display += game.guessed.includes(char) ? char : '_';
@@ -1345,21 +1156,20 @@ cmd({
             
             if (!display.includes('_')) {
                 activeGames.hangmanClassic.delete(gameId);
-                return reply(`🎉 *YOU WIN!*\n\nWord: ${game.word}`);
+                return reply(`🎉 *YOU WIN!*\n\nWord: ${game.word}\n\n> ® Powered by Tyrex Tech`);
             }
             
-            reply(`✅ *Correct!*\n\n${hangmanStages[game.attempts]}\n\nWord: ${game.display}\nAttempts: ${game.attempts}/6`);
+            reply(`✅ *Correct!*\n\n${hangmanStages[game.attempts]}\n\nWord: ${game.display}\nAttempts: ${game.attempts}/6\n\n> ® Powered by Tyrex Tech`);
             
         } else {
-            // Wrong guess
             game.attempts++;
             
             if (game.attempts >= game.maxAttempts) {
                 activeGames.hangmanClassic.delete(gameId);
-                return reply(`😢 *GAME OVER!*\n\n${hangmanStages[game.attempts]}\n\nWord was: ${game.word}`);
+                return reply(`😢 *GAME OVER!*\n\n${hangmanStages[game.attempts]}\n\nWord was: ${game.word}\n\n> ® Powered by Tyrex Tech`);
             }
             
-            reply(`❌ *Wrong!*\n\n${hangmanStages[game.attempts]}\n\nWord: ${game.display}\nAttempts: ${game.attempts}/6`);
+            reply(`❌ *Wrong!*\n\n${hangmanStages[game.attempts]}\n\nWord: ${game.display}\nAttempts: ${game.attempts}/6\n\n> ® Powered by Tyrex Tech`);
         }
         
     } catch (e) {
@@ -1367,7 +1177,7 @@ cmd({
     }
 });
 
-// Game menu
+// ==================== GAME MENU ====================
 cmd({
     pattern: "games",
     alias: ["gamelist", "game menu"],
@@ -1376,7 +1186,7 @@ cmd({
     react: "🎮",
     filename: __filename
 }, async (conn, mek, m, { reply }) => {
-    const menu = `🎮 *GAMES MENU*
+    const menu = `🎮 *TYREX MD GAMES MENU*
 
 ╔══════════════════════╗
 ║ 1. *Tic Tac Toe*      ║
@@ -1385,42 +1195,42 @@ cmd({
 ╠══════════════════════╣
 ║ 2. *Guess Number*     ║
 ║    .guessnumber       ║
-║    .guess <number>    ║
+║    .gnumber <number>  ║
 ╠══════════════════════╣
 ║ 3. *Word Chain*       ║
 ║    .wordchain         ║
-║    .chain <word>      ║
+║    .wchain <word>     ║
 ╠══════════════════════╣
 ║ 4. *Hangman*          ║
 ║    .hangman           ║
-║    .hang <letter>     ║
+║    .hguess <letter>   ║
 ╠══════════════════════╣
 ║ 5. *Quiz*             ║
 ║    .quiz              ║
-║    .answer <number>   ║
+║    .qanswer <number>  ║
 ╠══════════════════════╣
 ║ 6. *Riddle*           ║
 ║    .riddle            ║
-║    .solve <answer>    ║
+║    .rsolve <answer>   ║
 ╠══════════════════════╣
 ║ 7. *Math Quiz*        ║
 ║    .math              ║
-║    .mathanswer <num>  ║
+║    .mans <num>        ║
 ╠══════════════════════╣
 ║ 8. *Emoji Quiz*       ║
-║    .emoji             ║
-║    .emojianswer <ans> ║
+║    .emojiq            ║
+║    .eans <ans>        ║
 ╠══════════════════════╣
 ║ 9. *Memory Game*      ║
 ║    .memory            ║
 ║    .recall <numbers>  ║
 ╠══════════════════════╣
 ║10. *Typing Race*      ║
-║    .type              ║
+║    .typing            ║
 ║    .typeit <text>     ║
 ╠══════════════════════╣
 ║11. *Rock Paper Sciss* ║
-║    .rps <rock/paper/scissors>
+║    .rps <choice>      ║
 ╠══════════════════════╣
 ║12. *Truth or Dare*    ║
 ║    .truth / .dare     ║
@@ -1430,7 +1240,7 @@ cmd({
 ╠══════════════════════╣
 ║14. *Word Scramble*    ║
 ║    .scramble          ║
-║    .unscramble <word> ║
+║    .uns <word>        ║
 ╠══════════════════════╣
 ║15. *Crossword*        ║
 ║    .crossword         ║
@@ -1446,15 +1256,15 @@ cmd({
 ║    .checkers          ║
 ╠══════════════════════╣
 ║19. *Trivia*           ║
-║    .trivia            ║
-║    .triviaanswer <ans>║
+║    .triviaq           ║
+║    .tans <answer>     ║
 ╠══════════════════════╣
 ║20. *Hangman Classic*  ║
 ║    .hangclassic       ║
-║    .hcguess <letter>  ║
+║    .hcg <letter>      ║
 ╚══════════════════════╝
 
-> © 𝐒𝐈𝐋𝐀 𝐆𝐀𝐌𝐄𝐒`;
+> ® Powered by Tyrex Tech`;
 
     reply(menu);
 });
