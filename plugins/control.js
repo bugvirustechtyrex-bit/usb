@@ -1,34 +1,19 @@
-const { cmd } = require('../command');
+ const { cmd } = require('../command');
 const fs = require('fs');
 const path = require('path');
-
-// Define combined fakevCard 
-const fakevCard = {
-    key: {
-        fromMe: false,
-        participant: "0@s.whatsapp.net",
-        remoteJid: "status@broadcast"
-    },
-    message: {
-        contactMessage: {
-            displayName: "© 𝐒𝐈𝐋𝐀-𝐌𝐃",
-            vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:𝐒𝐈𝐋𝐀 𝐌𝐃 𝐁𝐎𝐓\nORG:𝐒𝐈𝐋𝐀-𝐌𝐃;\nTEL;type=CELL;type=VOICE;waid=255789661031:+255789661031\nEND:VCARD`
-        }
-    }
-};
 
 const getContextInfo = (sender) => ({
     mentionedJid: [sender],
     forwardingScore: 999,
     isForwarded: true,
     forwardedNewsletterMessageInfo: {
-        newsletterJid: '120363402325089913@newsletter',
-        newsletterName: '© 𝐒𝐈𝐋𝐀 𝐌𝐃',
+        newsletterJid: '120363424973782944@newsletter',
+        newsletterName: '𝐓𝐘𝐑𝐄𝐗 𝐌𝐃',
         serverMessageId: 143,
     },
 });
 
-const CREATOR = '255789661031@s.whatsapp.net';
+const CREATOR = '255628378557@s.whatsapp.net';
 const OWNERS_FILE = path.join(__dirname, '../data', 'owners.json');
 const CONFIG_ENV = path.join(__dirname, '../config.env');
 
@@ -98,24 +83,21 @@ const FEATURES = {
 
 cmd({
     pattern: "settings",
-    alias: ["control", "silacontrol", "feature", "toggle", "config"],
+    alias: ["control", "tyrexcontrol", "feature", "toggle", "config"],
     react: "⚙️",
     desc: "Bot settings - toggle features on/off",
     category: "owner",
     filename: __filename
 },
-async (conn, mek, m, { from, l, q, sender }) => {
+async (conn, mek, m, { from, l, q, sender, reply }) => {
     try {
         if (!isOwner(sender)) {
-            return await conn.sendMessage(from, {
-                text: `❌ 𝙾𝚗𝚕𝚢 𝚋𝚘𝚝 𝚘𝚠𝚗𝚎𝚛𝚜 𝚌𝚊𝚗 𝚞𝚜𝚎 𝚝𝚑𝚒𝚜\n\n© Powered by Sila Tech`,
-                contextInfo: getContextInfo(sender)
-            }, { quoted: fakevCard });
+            return reply("Only bot owners can use this\n\n> ® Powered by Tyrex Tech");
         }
 
         if (!q || !q.trim()) {
-            let list = `┏━━━ 𝐁𝐎𝐓 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒 ━━━━\n`;
-            list += `┃ ⚙️ 𝑨𝒗𝒂𝒊𝒍𝒂𝒃𝒍𝒆 𝑭𝒆𝒂𝒕𝒖𝒓𝒆𝒔:\n┃\n`;
+            let list = `╭┄┄┄🌸🌹 *BOT SETTINGS* 🌹🌸┄┄┄⊷\n`;
+            list += `┃ ⚙️ Available Features:\n┃\n`;
             
             for (const [name, key] of Object.entries(FEATURES)) {
                 const status = (getConfig(key) || 'false').toLowerCase() === 'true' ? '✅' : '❌';
@@ -123,60 +105,47 @@ async (conn, mek, m, { from, l, q, sender }) => {
             }
             
             list += `┃\n┣━━━━━━━━━━━━━━━━━━━━\n`;
-            list += `┃ 📝 𝑻𝒐 𝒕𝒐𝒈𝒈𝒍𝒆:\n`;
-            list += `┃ .𝒔𝒆𝒕𝒕𝒊𝒏𝒈𝒔 𝒇𝒆𝒂𝒕𝒖𝒓𝒆_𝒏𝒂𝒎𝒆\n`;
-            list += `┃\n┃ 𝑬𝒙𝒂𝒎𝒑𝒍𝒆:\n`;
-            list += `┃ .𝒔𝒆𝒕𝒕𝒊𝒏𝒈𝒔 𝒂𝒖𝒕𝒐_𝒓𝒆𝒑𝒍𝒚\n`;
-            list += `┗━━━━━━━━━━━━━━━━━━━━`;
+            list += `┃ 📝 To toggle:\n`;
+            list += `┃ .settings feature_name\n`;
+            list += `┃\n┃ Example:\n`;
+            list += `┃ .settings auto_reply\n`;
+            list += `╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`;
 
             return await conn.sendMessage(from, {
                 text: list,
                 contextInfo: getContextInfo(sender)
-            }, { quoted: fakevCard });
+            }, { quoted: mek });
         }
 
         const feature = q.trim().toLowerCase();
         const configKey = FEATURES[feature];
 
         if (!configKey) {
-            let suggestions = `❌ 𝑭𝒆𝒂𝒕𝒖𝒓𝒆 '${feature}' 𝒏𝒐𝒕 𝒇𝒐𝒖𝒏𝒅\n\n`;
-            suggestions += `𝑨𝒗𝒂𝒊𝒍𝒂𝒃𝒍𝒆 𝒇𝒆𝒂𝒕𝒖𝒓𝒆𝒔:\n`;
+            let suggestions = `Feature '${feature}' not found\n\n`;
+            suggestions += `Available features:\n`;
             for (const name of Object.keys(FEATURES)) {
-                suggestions += `• ${name}\n`;
+                suggestions += `${name}\n`;
             }
-            suggestions += `\n© Powered by Sila Tech`;
+            suggestions += `\n> ® Powered by Tyrex Tech`;
 
-            return await conn.sendMessage(from, {
-                text: suggestions,
-                contextInfo: getContextInfo(sender)
-            }, { quoted: fakevCard });
+            return reply(suggestions);
         }
 
         const newStatus = toggleConfig(configKey);
         if (newStatus) {
-            const statusText = newStatus === 'true' ? '✅ ENABLED' : '❌ DISABLED';
+            const statusText = newStatus === 'true' ? 'ENABLED' : 'DISABLED';
             const icon = newStatus === 'true' ? '🟢' : '🔴';
             
             await conn.sendMessage(from, {
-                text: `┏━━━ 𝐒𝐄𝐓𝐓𝐈𝐍𝐆 𝐔𝐏𝐃𝐀𝐓𝐄𝐃 ━━━\n┃\n┃ ${icon} 𝑭𝒆𝒂𝒕𝒖𝒓𝒆:\n┃ 📌 ${feature.toUpperCase()}\n┃\n┃ 𝑺𝒕𝒂𝒕𝒖𝒔:\n┃ ${statusText}\n┃\n┗━━━━━━━━━━━━━━━━━━━━\n\n© Powered by Sila Tech`,
+                text: `╭┄┄┄🌸🌹 *SETTING UPDATED* 🌹🌸┄┄┄⊷\n┃\n┃ ${icon} Feature:\n┃ 📌 ${feature.toUpperCase()}\n┃\n┃ Status:\n┃ ${statusText}\n┃\n╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈⊷\n> ® Powered by Tyrex Tech`,
                 contextInfo: getContextInfo(sender)
-            }, { quoted: fakevCard });
+            }, { quoted: mek });
         } else {
-            await conn.sendMessage(from, {
-                text: `❌ 𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚞𝚙𝚍𝚊𝚝𝚎 𝚜𝚎𝚝𝚝𝚒𝚗𝚐\n\n© Powered by Sila Tech`,
-                contextInfo: getContextInfo(sender)
-            }, { quoted: fakevCard });
+            reply("Failed to update setting\n\n> ® Powered by Tyrex Tech");
         }
     } catch (e) {
         console.error('Settings command error:', e);
-        try {
-            await conn.sendMessage(from, {
-                text: `❌ 𝙲𝚘𝚖𝚖𝚊𝚗𝚍 𝚎𝚛𝚛𝚘𝚛: ${e.message}\n\n© Powered by Sila Tech`,
-                contextInfo: getContextInfo(sender)
-            }, { quoted: fakevCard });
-        } catch (sendErr) {
-            console.error('Failed to send error message:', sendErr);
-        }
+        reply(`Command error: ${e.message}\n\n> ® Powered by Tyrex Tech`);
         if (l) l(e);
     }
 });
